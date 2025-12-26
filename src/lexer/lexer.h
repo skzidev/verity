@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * A list of token types
  * These include keywords, punctuation, and operators.

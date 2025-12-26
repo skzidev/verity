@@ -18,10 +18,33 @@ print(add(x, y));
 
 ## Building
 
-This project uses make to build. To build it, open this project in the root directory (in a terminal session) and run `$ make`.
+To build and run this project, run these commands:
+```sh
+make
+make run
+```
+
+**To run the test suite, run the following command:**
+
+```sh
+make test
+```
+
+Test files can be generated with the following command:
+
+```sh
+python tests/tools/gen.py {type} {module}
+```
+
+where `type` is one of the following: `unit,e2e,integration,golden`
+and `module` is the name of a module in the src folder.
 
 ## Language Design
 
 Velerity follows a couple of patterns to make debugging easy, and programming safer.
 
 [Look at the language spec](./notes/spec.md)
+
+## License
+
+This project (VerityC, the C compiler implementation of Verity) alongside verity's specification is licensed under MIT. [See more](./LICENSE)
