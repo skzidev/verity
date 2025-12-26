@@ -41,9 +41,9 @@ and `module` is the name of a module in the src folder.
 
 ## Language Design
 
-Velerity follows a couple of patterns to make debugging easy, and programming safer.
+Verity follows a couple of patterns to make debugging easy, and programming safer.
 
-[Look at the language spec](./notes/spec.md)
+[Look at the language spec](./notes/spec.md) or [View the grammar](./notes/grammar.ebnf)
 
 ## License
 

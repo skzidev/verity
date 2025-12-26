@@ -20,8 +20,9 @@ The Verity Programming Language
 
 // Define optional arguments with defaults
 #define OPTIONAL_ARGS \
-	OPTIONAL_STRING_ARG(optimization, "0", "-o", "optimization", "The optimization level that should be used") \
-	OPTIONAL_STRING_ARG(target, "x86-64", "-t", "target", "The target CPU architecture")
+	OPTIONAL_STRING_ARG(optimization, "0", "-o", "level", "The optimization level that should be used") \
+	OPTIONAL_STRING_ARG(target, "x86-64", "-t", "architecture", "The target CPU architecture") \
+	OPTIONAL_STRING_ARG(dump_ast, "./ast", "--dump-ast", "path", "Dump the AST to the provided file")
 
 // Define boolean flags
 #define BOOLEAN_ARGS \

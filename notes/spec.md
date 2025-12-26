@@ -36,7 +36,7 @@ Verity interpreters and compilers, within accordance with this document, must su
 | `else` | Marks an else clause on an if statement |
 | `while` | Marks a while loop |
 | `return` | Marks a return |
-| `propogate` | Marks an explicit propogation allowance |
+| `propagate` | Marks an explicit propogation allowance |
 | `throw` | Marks an exception throw statement |
 | `handle` | Marks an exception handling statement |
 | `recursive` | Marks a procedure as recursive |
@@ -214,11 +214,11 @@ Arrays and dictionaries are types of variables that allow multiple values to be 
 
 ### 4.1 Error specification
 
-Verity uses exceptions to handle errors, as they allow developers to easily debug programs. Exceptions can be handled through handle statements, as shown below, or they can be propogated up the call stack. In the event that an error is propogated up to the entrypoint of the program, the error must be logged to the console, through either `stdout` or preferably `stderr`, alongsde the error's message. Following the error output to the console, the program must be terminated.
+Verity uses exceptions to handle errors, as they allow developers to easily debug programs. Exceptions can be handled through handle statements, as shown below, or they can be propagated up the call stack. In the event that an error is propagated up to the entrypoint of the program, the error must be logged to the console, through either `stdout` or preferably `stderr`, alongsde the error's message. Following the error output to the console, the program must be terminated.
 
 If a procedure may produce an error, it must either declare that error in its `throws` clause, or handle it with a `handle` statement.
 
-When calling a procedure that throws one or more errors, those error(s) must be either propogated or handled.
+When calling a procedure that throws one or more errors, those error(s) must be either propagated or handled.
 
 Error must be descended of the `Error` class  to be implemented in the standard library of an implementation.
 
@@ -237,7 +237,7 @@ proc handler(err) returns string {
 
 proc main(string[] args) returns int {
     string content = fs.readText("../config.txt")
-        handle FileNotFoundError => handler();
+        handle FileNotFoundError as e => handler();
     ...
 }
 ```
@@ -253,19 +253,19 @@ foo() + bar()
 
 ### 4.3 Propogating errors
 
-Errors can be propogated up the call stack using the `propogate` keyword. For example:
+Errors can be propagated up the call stack using the `propagate` keyword. For example:
 
 ```
 import "std/fs" as fs;
 
 proc main(string[] args) returns int {
-    string content = propogate fs.readText("../config.txt");
+    string content = propagate fs.readText("../config.txt");
 }
 ```
 
-Implementations should return an error and refuse to exeucte or compile the code if an error is propogated and not handled further up the call stack.
+Implementations should return an error and refuse to exeucte or compile the code if an error is propagated and not handled further up the call stack.
 
-### 4.4 Notes on errors which are unhandled and unpropogated
+### 4.4 Notes on errors which are unhandled and unpropagated
 
 Implemenations of Verity must catch all errors that could potentially occur. Errors can come from:
 

@@ -1,0 +1,57 @@
+(*
+	grammar.ebnf
+	The Grammar of the Verity language in EBNF
+*)
+
+program = (import_statement | procedure_definition)*;
+
+import_statement = "import" identifier "as" identifier ";";
+procedure_definition = "recursive"? "proc" identifier "(" parameter_list? ")" returns_clause? throws_clause? block;
+returns_clause = "returns" identifier;
+throws_clause = "throws" identifier_list;
+block = "{" statement* "}";
+
+parameter_list = parameter ("," parameter)*;
+identifier_list = identifier ("," identifier)*;
+
+statement = (return_statement | procedure_call | assignment | variable_definition | if_statement | else_if_statement | else_statement | break_statement | skip_statement | for_statement | while_statement) handle_statement* ";";
+
+handle_statement = "handle" identifier "as" identifier "=>" statement;
+
+break_statement = "break"
+skip_statement = "skip"
+
+for_statement = "for" "(" assignment condition ";" statement ")" block;
+
+while_statement = "while" "(" condition ")" block;
+
+assignment = identifier "=" expression;
+variable_definition = "mut"? identifier identifier "=" expression;
+
+procedure_call = "propagate"? identifier "(" argument_list? ")";
+
+argument_list = expression ("," expression)*;
+
+if_statement = "if" "(" condition ")" (statement | block);
+else_if_statement = "else" "if" "(" condition ")" (statement | block);
+else_statement = "else" (statement | block);
+
+condition = expression comparator expression;
+
+comparator = "==" | "!=" | ">" | ">=" | "<" | "<=";
+
+return_statement = "return" expression;
+expression = "propagate"? add_expression;
+
+add_expression = mul_expression (("+" | "-") mul_expression)*;
+mul_expression = unary_expression (("*" | "/") unary_expression)*;
+unary_expression = ("+" | "-" | "!")? primary_expression;
+primary_expression = literal | identifier | "(" expression ")";
+
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+number = digit+ ("." digit+)?;
+string = "\"" (letter | digit | "." | "," | "?" | "!")* "\"";
+literal = number | string;
+letter = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z";
+
+parameter = "mut"? identifier identifier;
