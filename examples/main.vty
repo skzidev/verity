@@ -1,0 +1,9 @@
+proc add(int a , int b) returns int {
+    return a + b;
+}
+
+int x = 5;
+mut int y = 10;
+y = x / y;
+
+print(add(x, y));
