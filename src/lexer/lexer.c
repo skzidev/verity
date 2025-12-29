@@ -10,7 +10,8 @@ void TokenArray_push(TokenArray* array, Token tok){
 		array->capacity = array->capacity ? array->capacity * 2 : 16;
 		array->data = realloc(array->data, array->capacity * sizeof(Token));
 	}
-	// printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
+	if(tok.column <= 75)
+		printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
 	array->data[array->count++] = tok;
 }
 
@@ -90,6 +91,25 @@ TokenArray lexer_tokenize(char* input, char* fname){
 			case '=':
 				token.kind = TOK_ASSIGN;
 				break;
+			case '"':
+				NOTE("match str literal start", fname, token);
+				printf("\ni = %d", i);
+				token.kind = TOK_STRING;
+				i ++;
+				int strStart = i;
+				while(input[i] != '"'){
+					i ++;
+					column ++;
+					if(input[i] == '\n')
+						ERROR("L0001", "String literal must be terminated before a newline", fname, token);
+				}
+				int strLen = i - strStart;
+				char *buffer = malloc(strLen + 1);
+				memcpy(buffer, &input[strStart], strLen);
+				buffer[strLen] = '\0';
+				token.lexeme = buffer;
+				TokenArray_push(&tarr, token);
+				continue;
 			default:
 				int start = i;
 				while(isalnum(input[i])){

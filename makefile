@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -std=c11
 
-RUNFLAGS := examples/main.vty -v
+RUNFLAGS := examples/main.vty
 
 SRC := src/main.c \
 	src/lexer/lexer.c
@@ -17,12 +17,9 @@ all: $(BIN)
 
 $(BIN): $(SRC)
 	@mkdir -p bin
-	@-figlet -c Verity
 	$(CC) $(CFLAGS) -o $@ $^
 
 bin/%: tests/unit/%.c src/lexer/lexer.c
-	@- figlet -c Verity
-	@- echo Compiling tests for the Verity Compiler:
 	$(CC) $(CFLAGS) -o $@ $^
 
 run: $(BIN)
@@ -32,5 +29,4 @@ clean:
 	@rm -f $(BIN)
 
 test: $(TEST_BIN)
-	@- echo Running tests for the Verity Compiler:
 	@python tests/tools/run.py

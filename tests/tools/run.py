@@ -16,45 +16,61 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-tests = [test for test in os.listdir('./tests/unit') if test.startswith("test_")]
+failed_test_log = ""
 
-# TODO add e2e test support once compiler can build binaries
+def get_test_name(sourceName): return sourceName.replace(".c", "").replace("test_", "")
 
-print(f"running local testing suite, output > stdout\n")
-print(" ===== unit tests ===== \n")
+print(f"running testing suite")
+print(" ===== unit tests ===== ")
 
-passed = []
-failed = []
+unit_tests = [test for test in os.listdir('./tests/unit') if test.startswith("test_")]
 
-i = 0
+print(f"\t- found {len(unit_tests)} test(s). attempting all.")
 
-def get_test_name(file_name): return file_name.replace("test_", "").replace(".c", "")
+passed_unit_tests = []
+failed_unit_tests = []
 
-def update_counter(out_of=-1):
-	print(f"  - Testing... ({i}/{out_of if out_of >= 0 else len(tests)})", end="\r")
+for test in unit_tests:
+    print(f"\t- running test '{get_test_name(test)}'... ", end='')
+    output = subprocess.check_output(["./bin/" + test.replace('.c', '')])
+    if(output.decode('utf8').__contains__("[PASS]")):
+        print(bcolors.OKGREEN + "PASS" + bcolors.ENDC)
+        passed_unit_tests.append(test)
+    else:
+        print(bcolors.FAIL + "FAIL" + bcolors.ENDC)
+        failed_unit_tests.append(test)
+        failed_test_log += f" ===== log for test '{get_test_name(test)}' =====\n"
+        failed_test_log += (output).decode('utf8')
 
-update_counter()
+print(" ===== e2e tests =====")
 
-for test in tests:
-	execFile = ("./bin/" + test.replace(".c", ""))
-	output = subprocess.check_output([execFile])
-	if(chr(output[0]) == "["):
-		passed.append(test)
-	else:
-		failed.append(test)
+e2e_tests = []
 
-	i += 1
-	update_counter()
+print(f"\t- found {len(e2e_tests)} tests. attempting all.")
 
-print("\n")
+passed_e2e_tests = []
+failed_e2e_tests = []
 
-for test in failed:
-	print(f"{bcolors.FAIL}test failure: '{get_test_name(test)}'{bcolors.ENDC}")
+for test in e2e_tests:
+    print(f"\t- running test '{get_test_name(test)}'... ", end='')
+    output = subprocess.check_output(["./bin/" + test.replace('.c', '')])
+    if(str(output).__contains__("[PASS]")):
+        print(bcolors.OKGREEN + "PASS" + bcolors.ENDC)
+        passed_unit_tests.append(test)
+    else:
+        print(bcolors.FAIL + "FAIL" + bcolors.ENDC)
+        failed_unit_tests.append(test)
+        failed_test_log += f" ===== log for test '{get_test_name(test)}' ====="
+        failed_test_log += str(output)
 
-print(" ===== e2e tests ===== \n")
+passed = len(passed_e2e_tests) + len(passed_unit_tests)
+failed = len(failed_e2e_tests) + len(failed_unit_tests)
+print(f"{passed + failed} ran, {bcolors.OKGREEN}{passed}{bcolors.ENDC} passed, {bcolors.FAIL}{failed}{bcolors.ENDC} failed ({(passed / (passed + failed)) * 100}% passing rate).")
 
-print(f"\nran {len(tests)} test(s): {bcolors.OKGREEN}{len(passed)}{bcolors.ENDC} passed,"
-	  + f" {bcolors.FAIL}{len(failed)}{bcolors.ENDC} failed ({(len(passed)/len(tests))*100}% passing rate).")
-
-if(len(failed) != 0): exit(1)
-else: exit(0)
+if(failed > 0):
+    with open('./failed.log', 'w') as f:
+        f.write(failed_test_log)
+    print("the log of failed tests has been made available in './failed.log'")
+    exit(1)
+else:
+    exit(0)

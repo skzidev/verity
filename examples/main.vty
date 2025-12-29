@@ -5,9 +5,6 @@ proc add(int a, int b) returns int {
 }
 
 proc readFile(string path) returns string throws FileNotFoundError {
-	if(path != "./config.txt"){
-		print("somebody tweaked the code");
-	}
 	return propogate fs.readAsText(path);
 }
 
@@ -16,4 +13,3 @@ mut int y = 10;
 y = x / y;
 
 print(add(x, y));
-print(readFile("./config.txt") handle FileNotFoundError as e => print(e));
