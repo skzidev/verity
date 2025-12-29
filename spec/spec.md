@@ -210,6 +210,20 @@ Additionally, dereferencing a null pointer will lead to a defined `NullPointerEr
 
 Arrays and dictionaries are types of variables that allow multiple values to be stored within one variable. In Verity, Arrays and Dictionaries are dynamically sized. Dictionaries, which should be implemented as hash maps, are not reliably ordered by this specification. Any ordering consistency is a byproduct of the compiler's design, not this specification. Additionally, arrays and dictionaries store values, not references or pointers.
 
+### 3.9 Classes
+
+Classes in Verity are supported, and support polymorphic patterns. They're defined using the following syntax:
+
+```
+class myClass(/= parameter list =/){
+	// normal statements written in the class's body run as if they are in a constructor, accepting the parameters that the class was defined with
+
+	proc myProc() returns void {
+		print("I'm running inside of a class");
+	}
+}
+```
+
 # 4.0 Errors & Exceptions
 
 ### 4.1 Error specification

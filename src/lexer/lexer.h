@@ -96,4 +96,4 @@ void TokenArray_push(TokenArray* array, Token tok);
 /**
  * Tokenize an input string and return a TokenArray
  */
-TokenArray lexer_tokenize(char* input, char* fname);
+TokenArray lexer_tokenize(const char* input, char* fname);

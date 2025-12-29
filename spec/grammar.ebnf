@@ -3,13 +3,23 @@
 	The Grammar of the Verity language in EBNF
 *)
 
-program = (import_statement | procedure_definition)*;
+program = top_level_statement*;
+
+top_level_statement = (import_statement | procedure_definition | external_declaration);
 
 external_declaration = external_procedure_declaration | external_variable_declaration;
 external_procedure_declaration = "external" "proc" identifier "(" parameter_list? ")" returns_clause;
-external_variable_declaration = "external" identifer "=" expression;
+external_variable_declaration = "external" identifier "=" expression;
+
 import_statement = "import" identifier "as" identifier ";";
 procedure_definition = "recursive"? "proc" identifier "(" parameter_list? ")" returns_clause throws_clause? block;
+
+class_definition = "class" identfier "(" parameter_list? ")" class_block;
+
+class_block = "{" class_stmt* "}";
+
+class_stmt = (procedure_definition | procedure_call | assignment | variable_definition | if_statement | else_if_statement | else_statement | break_statement | skip_statement | for_statement | while_statement) handle_statement* ";";
+
 returns_clause = "returns" identifier;
 throws_clause = "throws" identifier_list;
 block = "{" statement* "}";

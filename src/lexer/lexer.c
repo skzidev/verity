@@ -29,7 +29,7 @@ TokenKind lookup(const char* keyword){
 		return TOK_IDENT;
 }
 
-TokenArray lexer_tokenize(char* input, char* fname){
+TokenArray lexer_tokenize(const char* input, char* fname){
 	int line = 0;
 	int column = 0;
 
@@ -99,7 +99,7 @@ TokenArray lexer_tokenize(char* input, char* fname){
 					i ++;
 					column ++;
 					if(input[i] == '\n')
-						ERROR("L0001", "String literal must be terminated before a newline", fname, token);
+						THROW_ERROR("L0001", "String literal must be terminated before a newline", fname, token);
 				}
 				int strLen = i - strStart;
 				char *buffer = malloc(strLen + 1);
@@ -118,7 +118,7 @@ TokenArray lexer_tokenize(char* input, char* fname){
 				break;
 			default:
 				if(!isalnum(input[i]))
-					ERROR("L0002", "Unexpected token", fname, token);
+					THROW_ERROR("L0002", "Unexpected token", fname, token);
 				int start = i;
 				while(isalnum(input[i])){
 					i ++;

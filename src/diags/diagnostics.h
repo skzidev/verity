@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define ERROR(code, msg, file, tok) \
+#define THROW_ERROR(code, msg, file, tok) \
     error_at(code, msg, file, tok.line, tok.column);
 #define NOTE(msg, file, tok) \
     note(msg, file, tok.line, tok.column);
