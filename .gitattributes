@@ -1,0 +1,3 @@
+*.ebnf linguist-language=EBNF linguist-detectable=true
+* text eol=lf
+*.png binary

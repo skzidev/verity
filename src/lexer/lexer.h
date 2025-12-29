@@ -64,6 +64,7 @@ typedef struct {
 /**
  * Keyword string -> TokenKind lookup table
  */
+#pragma GCC diagnostic ignored "-Wunused-variable"
 static Keyword keywords[] = {
 	{"proc", TOK_PROC},
 	{"propogate", TOK_PROPAGATE},

@@ -10,8 +10,7 @@ void TokenArray_push(TokenArray* array, Token tok){
 		array->capacity = array->capacity ? array->capacity * 2 : 16;
 		array->data = realloc(array->data, array->capacity * sizeof(Token));
 	}
-	if(tok.column <= 75)
-		printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
+	// printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
 	array->data[array->count++] = tok;
 }
 

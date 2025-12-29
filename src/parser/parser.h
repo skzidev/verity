@@ -1,3 +1,4 @@
+#include "../diags/diagnostics.h"
 #include "../lexer/lexer.h"
 #include <stdbool.h>
 
@@ -11,25 +12,11 @@ typedef struct {
 	TokenArray tokens;
 } Parser;
 
-const char* filename;
+extern const char* filename;
+extern Parser parser;
+extern Token tok;
 
-Token tok;
-
-void parser_advance();
-
-void parser_parse(TokenArray tarr, char* fname);
-
-bool parser_accept(TokenKind s){
-	if(s == tok.kind){
-		parser_advance();
-		return true;
-	}
-	return true;
-}
-
-bool parser_expect(TokenKind s){
-	if(accept(s))
-		return true;
-	THROW_ERROR("P0001", "unexpected symbol", filename, tok);
-	return false;
-}
+extern void parser_parse(TokenArray tarr, char* fname);
+extern void parser_advance();
+extern bool parser_accept(TokenKind s);
+extern bool parser_expect(TokenKind s);

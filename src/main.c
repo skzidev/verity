@@ -12,7 +12,10 @@ The Verity Programming Language
 #include <stdlib.h>
 #include <string.h>
 
-#include "lexer/lexer.h"
+#include "./lexer/lexer.h"
+#include "./parser/parser.h"
+
+#include "diags/diagnostics.h"
 
 // Define required positional arguments
 #define REQUIRED_ARGS \
@@ -55,7 +58,8 @@ int main(int argc, char *argv[]){
     fread(fcontent, 1, size, fptr);
 
 	// Compile main file5
-    lexer_tokenize(fcontent, args.input_file);
+    TokenArray tokenStream = lexer_tokenize(fcontent, args.input_file);
+	parser_parse(tokenStream, args.input_file);
 
     return 0;
 }

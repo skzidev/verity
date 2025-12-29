@@ -8,8 +8,8 @@ program = top_level_statement*;
 top_level_statement = (import_statement | procedure_definition | external_declaration);
 
 external_declaration = external_procedure_declaration | external_variable_declaration;
-external_procedure_declaration = "external" "proc" identifier "(" parameter_list? ")" returns_clause;
-external_variable_declaration = "external" identifier "=" expression;
+external_procedure_declaration = "external" "proc" identifier "(" parameter_list? ")" returns_clause ";";
+external_variable_declaration = "external" identifier identifier ";";
 
 import_statement = "import" identifier "as" identifier ";";
 procedure_definition = "recursive"? "proc" identifier "(" parameter_list? ")" returns_clause throws_clause? block;

@@ -3,8 +3,7 @@ CFLAGS := -Wall -Wextra -std=c11
 
 RUNFLAGS := examples/main.vty
 
-SRC := src/main.c \
-	src/lexer/lexer.c
+SRC := $(wildcard src/*.c src/*/*.c)
 
 BIN := bin/verity
 
@@ -19,7 +18,7 @@ $(BIN): $(SRC)
 	@mkdir -p bin
 	$(CC) $(CFLAGS) -o $@ $^
 
-bin/%: tests/unit/%.c src/lexer/lexer.c
+bin/%: tests/unit/%.c src/lexer/lexer.c src/diags/diagnostics.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 run: $(BIN)

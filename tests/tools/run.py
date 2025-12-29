@@ -46,7 +46,7 @@ print(" ===== e2e tests =====")
 
 e2e_tests = []
 
-print(f"\t- found {len(e2e_tests)} tests. attempting all.")
+print(f"\t- found {len(e2e_tests)} test(s). attempting all.")
 
 passed_e2e_tests = []
 failed_e2e_tests = []

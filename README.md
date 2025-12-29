@@ -2,10 +2,9 @@
 
 # Verity Compiler
 
-![License](https://img.shields.io/github/license/skzidev/verity?style=for-the-badge) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/skzidev/verity/c-cpp.yml?style=for-the-badge&branch=main&event=push)
+ ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/skzidev/verity/c-cpp.yml?style=for-the-badge&branch=main&event=push)
 
-
-Verity is an AOT-compiled programming language, built for readability and easy interopability with existing tooling. It's 100% compatible with C, and builds to LLVM IR.
+Verity is an AOT-compiled programming language, designed to maximize readability and DevEx.
 
 ```
 proc add(int a, int b) returns int {
@@ -39,14 +38,7 @@ Test files can be generated with the following command:
 python tests/tools/gen.py {type} {module}
 ```
 
-where `type` is one of the following: `unit,e2e,integration,golden`
-and `module` is the name of a module in the src folder.
-
-## Language Design
-
-Verity follows a couple of patterns to make debugging easy, and programming safer.
-
-[Look at the language spec](./spec/spec.md) or [View the grammar](./spec/grammar.ebnf)
+where `type` is either: `unit`, or `e2e` and `module` is the name of a module in the src folder.
 
 ## License
 
