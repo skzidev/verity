@@ -39,7 +39,8 @@ typedef enum {
 	TOK_PERIOD,
 	TOK_ASSIGN,
 	TOK_PLUS, TOK_MINUS,
-	TOK_STAR, TOK_SLASH
+	TOK_STAR, TOK_SLASH,
+	TOK_RARR, TOK_EXCL
 } TokenKind;
 
 typedef struct {

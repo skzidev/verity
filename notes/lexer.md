@@ -53,6 +53,13 @@ Tokens are defined with the `Token` struct, and they contain a string, the textu
 
 A lookup table was also used to map keyword strings onto keyword token types, so that each keyword gets its own lexer type.
 
+## Errors
+
+| Error code | Fix |
+|------------|-----|
+| `L0001` | Place the closing quote of the offending string before a newline |
+| `L0002` | Find the token at the specified line/column, then find a way to remove it. |
+
 ## Closing
 
 Lexers seem simple, and that's because they are, but they are crucial for compilation. Compilers must deal a lot in string manipulation, and lexers divide one long string into smaller substrings, dubbed tokens, that are used later in the compilation process. 

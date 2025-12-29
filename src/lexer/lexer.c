@@ -92,8 +92,6 @@ TokenArray lexer_tokenize(char* input, char* fname){
 				token.kind = TOK_ASSIGN;
 				break;
 			case '"':
-				NOTE("match str literal start", fname, token);
-				printf("\ni = %d", i);
 				token.kind = TOK_STRING;
 				i ++;
 				int strStart = i;
@@ -109,8 +107,18 @@ TokenArray lexer_tokenize(char* input, char* fname){
 				buffer[strLen] = '\0';
 				token.lexeme = buffer;
 				TokenArray_push(&tarr, token);
+				i ++;
+				column ++;
 				continue;
+			case '>':
+				token.kind = TOK_RARR;
+				break;
+			case '!':
+				token.kind = TOK_EXCL;
+				break;
 			default:
+				if(!isalnum(input[i]))
+					ERROR("L0002", "Unexpected token", fname, token);
 				int start = i;
 				while(isalnum(input[i])){
 					i ++;
