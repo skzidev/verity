@@ -1,6 +1,9 @@
-<img src="./assets/Verity.png" style="border-radius: 20px;" />
+<!-- <img src="./assets/Verity.png" style="border-radius: 20px;" /> -->
 
 # Verity Compiler
+
+![License](https://img.shields.io/github/license/skzidev/verity?style=for-the-badge) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/skzidev/verity/c-cpp.yml?style=for-the-badge&branch=main&event=push)
+
 
 Verity is an AOT-compiled programming language, built for readability and easy interopability with existing tooling. It's 100% compatible with C, and builds to LLVM IR.
 
