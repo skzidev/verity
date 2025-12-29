@@ -1,0 +1,20 @@
+name: Build and test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup build env
+      run: sudo apt-get install build-essential gcc make
+    - name: Build the Verity compiler
+      run: make
+    - name: Run tests
+      run: make test
