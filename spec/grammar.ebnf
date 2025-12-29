@@ -5,8 +5,11 @@
 
 program = (import_statement | procedure_definition)*;
 
+external_declaration = external_procedure_declaration | external_variable_declaration;
+external_procedure_declaration = "external" "proc" identifier "(" parameter_list? ")" returns_clause;
+external_variable_declaration = "external" identifer "=" expression;
 import_statement = "import" identifier "as" identifier ";";
-procedure_definition = "recursive"? "proc" identifier "(" parameter_list? ")" returns_clause? throws_clause? block;
+procedure_definition = "recursive"? "proc" identifier "(" parameter_list? ")" returns_clause throws_clause? block;
 returns_clause = "returns" identifier;
 throws_clause = "throws" identifier_list;
 block = "{" statement* "}";
@@ -51,7 +54,8 @@ primary_expression = literal | identifier | "(" expression ")";
 digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 number = digit+ ("." digit+)?;
 string = "\"" (letter | digit | "." | "," | "?" | "!")* "\"";
-literal = number | string;
+boolean = "true" | "false";
+literal = number | string | boolean | "null";
 letter = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z";
 
 parameter = "mut"? identifier identifier;

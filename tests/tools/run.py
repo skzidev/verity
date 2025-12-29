@@ -55,3 +55,6 @@ print(" ===== e2e tests ===== \n")
 
 print(f"\nran {len(tests)} test(s): {bcolors.OKGREEN}{len(passed)}{bcolors.ENDC} passed,"
 	  + f" {bcolors.FAIL}{len(failed)}{bcolors.ENDC} failed ({(len(passed)/len(tests))*100}% passing rate).")
+
+if(len(failed) != 0): exit(1)
+else: exit(0)

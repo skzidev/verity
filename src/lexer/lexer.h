@@ -30,6 +30,7 @@ typedef enum {
 	TOK_HANDLE,
 	TOK_IMPORT,
 	TOK_AS,
+	TOK_EXTERNAL,
 
 	// Symbols
 	TOK_LPAREN, TOK_RPAREN,
@@ -59,6 +60,9 @@ typedef struct {
 	TokenKind kind;
 } Keyword;
 
+/**
+ * Keyword string -> TokenKind lookup table
+ */
 static Keyword keywords[] = {
 	{"proc", TOK_PROC},
 	{"propogate", TOK_PROPAGATE},
@@ -78,6 +82,7 @@ static Keyword keywords[] = {
 	{"throw", TOK_THROW},
 	{"import", TOK_IMPORT},
 	{"as", TOK_AS},
+	{"external", TOK_EXTERNAL}
 };
 
 TokenKind lookup(const char* keyword);

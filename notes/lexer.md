@@ -2,12 +2,13 @@
 
 The lexer has one main goal. It is the first part of the compilation process, and its job is to take the input (in the form of a string), and convert it into "tokens", which are fed into the parser to later generate an AST.
 
-The lexer is fairly simple. It defines some token types. In our case, we declare them in an enum with a total of 25 types. These types are listed below. The lexer loops through each character in the input, and assigns a different token type for each character. In the case that it encounters an alphanumeric character, however, it consumes all alphanumeric characters proceeding it, so that each "word", if you will, will be in a singular token. 
+The lexer is fairly simple. It defines some token types. In our case, we declare them in an enum with a total of 35 types. These types are listed below. The lexer loops through each character in the input, and assigns a different token type for each character. In the case that it encounters an alphanumeric character, however, it consumes all alphanumeric characters proceeding it, so that each "word", if you will, will be in a singular token. 
 
 ### General
 - `TOK_EOF`
 - `TOK_IDENT`
 - `TOK_INT`
+- `TOK_FLOAT`
 - `TOK_STRING`
 
 ### Keywords
@@ -18,8 +19,17 @@ The lexer is fairly simple. It defines some token types. In our case, we declare
 - `TOK_IF`
 - `TOK_ELSE`
 - `TOK_WHILE`
+- `TOK_FOR`
 - `TOK_RETURN`
 - `TOK_PROPAGATE`
+- `TOK_SKIP`
+- `TOK_BREAK`
+- `TOK_THROW`
+- `TOK_RECURSIVE`
+- `TOK_SWITCH`
+- `TOK_HANDLE`
+- `TOK_IMPORT`
+- `TOK_AS`
 
 ### Symbols
 - `TOK_LPAREN`
