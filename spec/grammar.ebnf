@@ -31,8 +31,8 @@ statement = (return_statement | procedure_call | assignment | variable_definitio
 
 handle_statement = "handle" identifier "as" identifier "=>" statement;
 
-break_statement = "break"
-skip_statement = "skip"
+break_statement = "break";
+skip_statement = "skip";
 
 for_statement = "for" "(" assignment condition ";" statement ")" block;
 

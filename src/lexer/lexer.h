@@ -40,7 +40,8 @@ typedef enum {
 	TOK_ASSIGN,
 	TOK_PLUS, TOK_MINUS,
 	TOK_STAR, TOK_SLASH,
-	TOK_RARR, TOK_EXCL
+	TOK_RARR, TOK_LARR,
+	TOK_EXCL
 } TokenKind;
 
 typedef struct {

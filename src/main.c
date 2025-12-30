@@ -23,13 +23,13 @@ The Verity Programming Language
 
 // Define optional arguments with defaults
 #define OPTIONAL_ARGS \
-	OPTIONAL_STRING_ARG(optimization, "0", "-o", "level", "The optimization level that should be used") \
-	OPTIONAL_STRING_ARG(target, "x86-64", "-t", "architecture", "The target CPU architecture") \
+	OPTIONAL_STRING_ARG(optimization, "0", "-O", "level", "The optimization level that should be used [0-3]") \
+	OPTIONAL_STRING_ARG(target, "x86-64", "-t", "architecture", "The target CPU architecture [x86-64,aarch64]") \
 	OPTIONAL_STRING_ARG(dump_ast, "./ast", "--dump-ast", "path", "Dump the AST to the provided file")
 
 // Define boolean flags
 #define BOOLEAN_ARGS \
-    BOOLEAN_ARG(help, "-h", "Show help") \
+    BOOLEAN_ARG(help, "-h", "Show this help screen") \
 	BOOLEAN_ARG(verbose, "-v", "Log extra information about compilation") \
 	BOOLEAN_ARG(silent, "-s", "Log nothing to stdout")
 
@@ -57,9 +57,9 @@ int main(int argc, char *argv[]){
     char* fcontent = (char*) malloc(size * sizeof(char));
     fread(fcontent, 1, size, fptr);
 
-	// Compile main file5
+	// Compile main file
     TokenArray tokenStream = lexer_tokenize(fcontent, args.input_file);
-	parser_parse(tokenStream, args.input_file);
+	parser_parse(&tokenStream, args.input_file);
 
     return 0;
 }

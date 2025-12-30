@@ -2,7 +2,11 @@
 
 # Verity Compiler
 
+ ![GitHub language count](https://img.shields.io/github/languages/count/skzidev/verity?style=for-the-badge)
+ ![GitHub top language](https://img.shields.io/github/languages/top/skzidev/verity?style=for-the-badge)
+ ![GitHub License](https://img.shields.io/github/license/skzidev/verity?style=for-the-badge)
  ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/skzidev/verity/c-cpp.yml?style=for-the-badge&branch=main&event=push)
+
 
 Verity is an AOT-compiled programming language, designed to maximize readability and DevEx.
 

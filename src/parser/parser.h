@@ -9,14 +9,14 @@ found here: https://en.wikipedia.org/wiki/Recursive_descent_parser#C_implementat
 
 typedef struct {
 	size_t pos;
-	TokenArray tokens;
+	TokenArray* tokens;
 } Parser;
 
 extern const char* filename;
 extern Parser parser;
 extern Token tok;
 
-extern void parser_parse(TokenArray tarr, char* fname);
+extern void parser_parse(TokenArray* tarr, char* fname);
 extern void parser_advance();
 extern bool parser_accept(TokenKind s);
 extern bool parser_expect(TokenKind s);

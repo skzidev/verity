@@ -11,7 +11,7 @@ Parser parser;
 Token tok;
 
 void parser_advance(){
-	tok = parser.tokens.data[parser.pos ++];
+	tok = parser.tokens->data[parser.pos ++];
 }
 
 bool parser_accept(TokenKind s){
@@ -26,7 +26,6 @@ bool parser_expect(TokenKind s){
 	if(parser_accept(s))
 		return true;
 	char* errorMessage = (char*) malloc((21 + strlen(tok.lexeme)) * sizeof(char));
-	printf("%ld\n", strlen(tok.lexeme));
 	sprintf(errorMessage, "unexpected symbol '%d'; expected '%d'", tok.kind, s);
 	THROW_ERROR("P0001", errorMessage, filename, tok);
 	return false;
@@ -38,8 +37,8 @@ bool parser_expect(TokenKind s){
 typedef struct {} Program;
 
 void parser_import_statement(){
+	note("found import statement", filename, tok.line, tok.column);
 	parser_expect(TOK_IMPORT);
-	printf("found import statement for lib '%s'\n", tok.lexeme);
 	parser_expect(TOK_STRING);
 	parser_expect(TOK_AS);
 	parser_expect(TOK_IDENT);
@@ -79,7 +78,7 @@ void parser_throws_clause(){
 void parser_procedure_definition(){
 	if(parser_accept(TOK_RECURSIVE)){} // `recursive` keyword is optional
 	parser_expect(TOK_PROC);
-	printf("%s", tok.lexeme);
+	printf("%s\n", tok.lexeme);
 	parser_expect(TOK_IDENT);
 	parser_expect(TOK_LPAREN);
 	if(tok.kind != TOK_RPAREN){
@@ -116,7 +115,6 @@ void parser_external_declaration(){
 }
 
 void parser_top_level_stmt(){
-	printf("%s\n", tok.lexeme);
 	if(tok.kind == TOK_IMPORT){
 		parser_import_statement();
 	} else if(tok.kind == TOK_RECURSIVE || tok.kind == TOK_PROC){
@@ -138,7 +136,7 @@ void parser_program(){
 
 #pragma endregion
 
-extern void parser_parse(TokenArray tarr, char* fname){
+void parser_parse(TokenArray* tarr, char* fname){
 	filename = fname;
 
 	parser.tokens = tarr;

@@ -1,6 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "lexer.h"
 
 #include "../diags/diagnostics.h"
@@ -39,6 +40,8 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 		char currentChar = input[i];
 		column ++;
 
+		printf("(%c) l: %d, c: %d\n", currentChar, line, column);
+
 		Token token;
 		token.lexeme = &currentChar;
 		token.column = column;
@@ -46,8 +49,8 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 
 		switch(currentChar){
 			case '\n':
-				column = 0;
 				line ++;
+				column = 0;
 				i ++;
 				continue;
 			break;
@@ -69,14 +72,28 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 				token.kind = TOK_COMMA;
 				break;
 			case '\t':
+				i ++;
+				column += 4;
+				break;
 			case ' ':
 				i ++;
+				column ++;
 				continue;
 			case '+':
 				token.kind = TOK_PLUS;
 				break;
 			case '/':
 				token.kind = TOK_SLASH;
+				if(input[i + 1] == '/')
+					while(input[i] != '\n'){
+						i ++;
+						column ++;
+					}
+				else if(input[i + 1] == '=')
+					while(input[i] != '=' && input[i + 1] != '/'){
+						i ++;
+						column ++;
+					}
 				break;
 			case '*':
 				token.kind = TOK_STAR;
@@ -93,6 +110,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 			case '"':
 				token.kind = TOK_STRING;
 				i ++;
+				column ++;
 				int strStart = i;
 				while(input[i] != '"'){
 					i ++;
@@ -111,6 +129,9 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 				continue;
 			case '>':
 				token.kind = TOK_RARR;
+				break;
+			case '<':
+				token.kind = TOK_LARR;
 				break;
 			case '!':
 				token.kind = TOK_EXCL;
@@ -136,6 +157,12 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 		TokenArray_push(&tarr, token);
 		i ++;
 	}
+	Token eof;
+	eof.kind = TOK_EOF;
+	eof.lexeme = '\0';
+	eof.line = line;
+	eof.column = column;
+	TokenArray_push(&tarr, eof);
 
 	return tarr;
 }

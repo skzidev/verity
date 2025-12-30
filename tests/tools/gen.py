@@ -1,39 +1,41 @@
 """
-	Create a unit test macro: Run this file (`python3 ./tests/gen.py {module_name}`)
+	Create a unit test macro: Run this file (`python3 ./tests/gen.py {test_type} {unit_name}`)
 	to generate a test file that tests a unit of the inputted module name.
 """
 
 import sys
+import os
 
+template_header = "This file is a test template, and should be modified before use in the testing suite"
 
-def generate_test_unit(unit_name):
-	file = f"#include <assert.h>\n#include <stdio.h>\n#include \"../../src/{unit_name}/{unit_name}.c\"\n\n"
+def generate_unit_test(unit_name):
+	header = "// " + template_header + "\n"
+	includes = ["<assert.h>", "<stdio.h>", "<stdbool.h>", f"\"../../src/{unit_name}/{unit_name}.h\""]
+	includes = ["#include " + include for include in includes]
 
-	def generate_function_def(name, return_type, code):
-		return f"{return_type} {name}()\u007b\n\t{code}\n\u007d"
+	body = f"void test_{unit_name}(void){{\n\t// Add your test logic here\n\tassert(true);\n}}\n"
+	body += f"int main(){{\n\ttest_{unit_name}();\n\tprintf(\"[PASS]: Test '{unit_name}' Passed\\n\");\n\treturn 0;\n}}"
 	
-	file += generate_function_def("test_" + unit_name, "void", "// Define your unit testing logic here\n") + "\n\n"
-	file += generate_function_def("main", "int", f"// Define arguments for your test here\n\n\t// Run your test here\n\ttest_{unit_name}();\n\tprintf(\"[PASS]: Test '{unit_name}' Passed\\n\");\n\treturn 0;")
+	return header + "\n".join(includes) + "\n\n" + body
 
-	return file
+def generate_e2e_test(unit_name):
+	return f"// {template_header}\nproc main(string[] args) returns int {{\n\t// Write your E2E test here\n\treturn 0;\n}}"
 
-def generate_test_e2e(unit_name):
-	return "proc main(string[] args) returns int {\n\t// Define your program here\n}"
+def generate_test(unit_name, unit_type):
+	if(unit_type == "unit"):
+		return generate_unit_test(unit_name)
+	elif(unit_type == "e2e"):
+		return generate_e2e_test(unit_name)
+	else:
+		raise TypeError(f"Unsupported test type: {unit_type}")
 
-if(len(sys.argv) < 3):
-	raise TypeError("insufficient arguments")
-
-types = ["unit", "e2e", "integration", "golden"]
-
-type = sys.argv[1]
-if(type not in types): raise TypeError("invalid test type: '{}'".format(type))
-unit = sys.argv[2]
-
-new_file = ""
-
-if(type == 'unit'): new_file = generate_test_unit(unit)
-elif(type == "e2e"): new_file = generate_test_e2e(unit)
-else: raise TypeError("test type '{}' not supported by this test script (only unit and e2e)".format(type))
-with open(f"./tests/{type}/test_{unit}.c", 'w') as f:
-	f.write(new_file)
-	print(f"successfully generated test '{unit}'")
+if __name__ == "__main__":
+	if(len(sys.argv) < 3):
+		raise TypeError("Insufficient arguments. usage: python3 ./tests/gen.py <test_type> <unit_name>")
+	test_type = sys.argv[1]
+	unit_name = sys.argv[2]
+	content = generate_test(unit_name, test_type)
+	test_path = os.path.join("./tests", f"{test_type}/test_{unit_name}." + ("c" if test_type == "unit" else "vty"))
+	with open(test_path, 'w') as f:
+		f.write(content)
+	print(f"Successfully generated {test_type} test \"{unit_name}\"")
