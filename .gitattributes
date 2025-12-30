@@ -1,3 +1,4 @@
 *.ebnf linguist-language=EBNF linguist-detectable=true
 * text eol=lf
 *.png binary
+configure linguist-language=Shell linguist-detectable=true
