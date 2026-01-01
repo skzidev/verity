@@ -37,8 +37,12 @@ bool parser_expect(TokenKind s){
 
 typedef struct {} Program;
 
+typedef struct {
+    const char* package;
+    const char* ident;
+} ImportStatement;
+
 void parser_import_statement(){
-	note("found import statement", filename, tok.line, tok.column);
 	parser_expect(TOK_IMPORT);
 	parser_expect(TOK_STRING);
 	parser_expect(TOK_AS);
@@ -55,6 +59,46 @@ void parser_parameter_list(){
 		if(tok.kind == TOK_RPAREN) break;
 		parser_expect(TOK_COMMA);
 	}
+}
+
+void parser_expression(){
+    // TODO implement
+}
+
+void parser_break_statement(){
+    parser_expect(TOK_BREAK);
+}
+
+void parser_skip_statement(){
+    parser_expect(TOK_SKIP);
+}
+
+void parser_return_statement(){
+    parser_expect(TOK_RETURN);
+    parser_expression();
+}
+
+void parser_variable_definition(){
+    if(tok.kind == TOK_MUT){} // Variable is mutable
+    parser_expect(TOK_IDENT); // type
+    parser_expect(TOK_IDENT); // identifier
+    parser_expect(TOK_ASSIGN);
+    parser_expression();
+}
+
+void parser_statement(){
+    if(tok.kind == TOK_RETURN){
+        // return stmt
+        parser_return_statement();
+    } else if(tok.kind == TOK_BREAK) {
+        // break stmt
+        parser_break_statement();
+    } else if(tok.kind == TOK_SKIP){
+        // skip stmt
+        parser_skip_statement();
+    }
+    // TODO implement other types
+    parser_expect(TOK_SEMI);
 }
 
 void parser_block(){

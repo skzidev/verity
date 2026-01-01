@@ -1,11 +1,11 @@
 /*
-__     __        _ _         
-\ \   / /__ _ __(_) |_ _   _ 
+__     __        _ _
+\ \   / /__ _ __(_) |_ _   _
  \ \ / / _ \ '__| | __| | | |
   \ V /  __/ |  | | |_| |_| |
    \_/ \___|_|  |_|\__|\__, |
-                       |___/ 
-The Verity Programming Language
+                       |___/
+    The Verity Compiler
 */
 
 #include <stdio.h>
@@ -15,11 +15,16 @@ The Verity Programming Language
 #include "./lexer/lexer.h"
 #include "./parser/parser.h"
 
+#include "./config/config.h"
+
 #include "diags/diagnostics.h"
+
+#define COMPILER_VERSION "0.0.1"
+#define LANGUAGE_VERSION "2025"
 
 // Define required positional arguments
 #define REQUIRED_ARGS \
-    REQUIRED_STRING_ARG(input_file, "input", "Input file path")
+    REQUIRED_STRING_ARG(input_file, "input", "Input file path") \
 
 // Define optional arguments with defaults
 #define OPTIONAL_ARGS \
@@ -30,26 +35,22 @@ The Verity Programming Language
 // Define boolean flags
 #define BOOLEAN_ARGS \
     BOOLEAN_ARG(help, "-h", "Show this help screen") \
-	BOOLEAN_ARG(verbose, "-v", "Log extra information about compilation") \
+	BOOLEAN_ARG(version, "-v", "Display version information and exit") \
 	BOOLEAN_ARG(silent, "-s", "Log nothing to stdout")
-
-#include "../include/easyargs.h"
 
 FILE* fptr;
 
 int main(int argc, char *argv[]){
 	// Read args
-	args_t args = make_default_args();
-	if(!parse_args(argc, argv, &args) || args.help){
-		print_help(argv[0]);
-		return 1;
-	}
+	CompilerOptions opts = ParseArgs(argc, argv);
 
-    if(args.verbose)
-        printf("reading input file '%s'\n", args.input_file);
+    if(opts.version){
+        printf("VerityC, version %s.\nImplementing Verity %s.\nLicensed under the MIT license.\n", COMPILER_VERSION, LANGUAGE_VERSION);
+        exit(0);
+    }
 
 	// Read main source file
-    fptr = fopen(args.input_file, "r");
+    fptr = fopen(opts.inputFiles[0], "r");
     fseek(fptr, 0, SEEK_END);
     long size = ftell(fptr);
     fseek(fptr, 0, SEEK_SET);
@@ -58,8 +59,8 @@ int main(int argc, char *argv[]){
     fread(fcontent, 1, size, fptr);
 
 	// Compile main file
-    TokenArray tokenStream = lexer_tokenize(fcontent, args.input_file);
-	parser_parse(&tokenStream, args.input_file);
+    TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
+	parser_parse(&tokenStream, opts.inputFiles[0]);
 
     return 0;
 }

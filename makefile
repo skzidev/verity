@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -std=c11 -g
 
-RUNFLAGS := examples/main.vty
+RUNFLAGS := -v examples/main.vty
 
 SRC := $(wildcard src/*.c src/*/*.c)
 
@@ -24,6 +24,7 @@ bin/%: tests/unit/%.c src/lexer/lexer.c src/diags/diagnostics.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 run: $(BIN)
+	@echo " ============= program output ============="
 	./$(BIN) $(RUNFLAGS)
 
 clean:
