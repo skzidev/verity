@@ -24,6 +24,12 @@ print(add(x, y));
 
 ## Building
 
+Build requirements:
+- Make
+- Bash (or compatible; on Windows MSYS or Git Bash)
+- GCC
+- Cppcheck
+
 To build and run this project, run these commands:
 ```sh
 make

@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -Wall -Wextra -std=c11
+CFLAGS := -Wall -Wextra -std=c11 -g
 
 RUNFLAGS := examples/main.vty
 
@@ -34,4 +34,11 @@ test: $(TEST_BIN)
 
 lint: $(BIN)
 	@echo This command requires cppcheck to be installed.
-	cppcheck $(SRC)
+	cppcheck $(SRC) $(TEST_SRCS)
+
+help:
+	@echo "Available Build Targets:"
+	@echo "\t- make / make all   Build the compiler"
+	@echo "\t- make run          Build and run"
+	@echo "\t- make test         Run tests"
+	@echo "\t- make clean        Remove build artifacts"

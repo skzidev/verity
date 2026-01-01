@@ -35,7 +35,7 @@ The Verity Programming Language
 
 #include "../include/easyargs.h"
 
-FILE *fptr;
+FILE* fptr;
 
 int main(int argc, char *argv[]){
 	// Read args

@@ -1,7 +1,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include "lexer.h"
 
 #include "../diags/diagnostics.h"
@@ -11,7 +10,7 @@ void TokenArray_push(TokenArray* array, Token tok){
 		array->capacity = array->capacity ? array->capacity * 2 : 16;
 		array->data = realloc(array->data, array->capacity * sizeof(Token));
 	}
-	// printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
+	printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
 	array->data[array->count++] = tok;
 }
 
@@ -40,7 +39,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 		char currentChar = input[i];
 		column ++;
 
-		printf("(%c) l: %d, c: %d\n", currentChar, line, column);
+		// printf("(%c) l: %d, c: %d\n", currentChar, line, column);
 
 		Token token;
 		token.lexeme = &currentChar;
@@ -55,6 +54,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 				continue;
 			break;
 			case '(':
+			    token.kind = TOK_LPAREN;
 				break;
 			case ')':
 				token.kind = TOK_RPAREN;
@@ -157,12 +157,15 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 		TokenArray_push(&tarr, token);
 		i ++;
 	}
+
 	Token eof;
 	eof.kind = TOK_EOF;
 	eof.lexeme = '\0';
 	eof.line = line;
 	eof.column = column;
 	TokenArray_push(&tarr, eof);
+
+	NOTE("lexer stop", fname, eof);
 
 	return tarr;
 }

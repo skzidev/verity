@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Setup build env
-      run: ./configure
+      run: ./configure.sh
     - name: Build the Verity compiler
       run: make
     - name: Run tests

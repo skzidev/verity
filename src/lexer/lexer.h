@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 /**
  * A list of token types
  * These include keywords, punctuation, and operators.

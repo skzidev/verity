@@ -25,6 +25,7 @@ bool parser_accept(TokenKind s){
 bool parser_expect(TokenKind s){
 	if(parser_accept(s))
 		return true;
+	printf("%d:%d\n", tok.line, tok.column);
 	char* errorMessage = (char*) malloc((21 + strlen(tok.lexeme)) * sizeof(char));
 	sprintf(errorMessage, "unexpected symbol '%d'; expected '%d'", tok.kind, s);
 	THROW_ERROR("P0001", errorMessage, filename, tok);
@@ -46,18 +47,20 @@ void parser_import_statement(){
 }
 
 void parser_parameter_list(){
-	while(parser_accept(TOK_IDENT)){
+	while(tok.kind == (TOK_IDENT) || tok.kind == TOK_MUT){
 		// consume another parameter
+		if(tok.kind == (TOK_MUT)){ parser_advance(); } // mut can be used here too
 		parser_expect(TOK_IDENT);
 		parser_expect(TOK_IDENT);
+		if(tok.kind == TOK_RPAREN) break;
 		parser_expect(TOK_COMMA);
 	}
 }
 
 void parser_block(){
 	parser_expect(TOK_LBRACE);
-	while(!parser_accept(TOK_RBRACE)){
-		parser_import_statement(); // TODO replace with stmt
+	while(tok.kind != (TOK_RBRACE)){
+	    // TODO implement statement
 	}
 	parser_expect(TOK_RBRACE);
 }
@@ -69,19 +72,18 @@ void parser_returns_clause(){
 
 void parser_throws_clause(){
 	parser_expect(TOK_THROWS);
-	while(parser_accept(TOK_IDENT)){
+	while(tok.kind == (TOK_IDENT)){
 		parser_expect(TOK_IDENT);
 		parser_expect(TOK_COMMA);
 	}
 }
 
 void parser_procedure_definition(){
-	if(parser_accept(TOK_RECURSIVE)){} // `recursive` keyword is optional
+	if(tok.kind == (TOK_RECURSIVE)){ parser_advance(); } // `recursive` keyword is optional
 	parser_expect(TOK_PROC);
-	printf("%s\n", tok.lexeme);
 	parser_expect(TOK_IDENT);
 	parser_expect(TOK_LPAREN);
-	if(tok.kind != TOK_RPAREN){
+	if(tok.kind != (TOK_RPAREN)){
 		parser_parameter_list();
 	}
 	parser_expect(TOK_RPAREN);
@@ -107,9 +109,9 @@ void parser_external_declaration(){
 	} else {
 		// external variable declaration
 		parser_expect(TOK_IDENT);
-		// type
+		// ^ type
 		parser_expect(TOK_IDENT);
-		// name
+		// ^ name
 		parser_expect(TOK_SEMI);
 	}
 }
@@ -129,7 +131,8 @@ void parser_top_level_stmt(){
 }
 
 void parser_program(){
-	while(tok.kind != TOK_EOF){ // note: EOF may not have been implemented yet?
+    parser_advance();
+	while(tok.kind != (TOK_EOF)){ // note: EOF may not have been implemented yet?
 		parser_top_level_stmt();
 	}
 }
@@ -142,8 +145,6 @@ void parser_parse(TokenArray* tarr, char* fname){
 	parser.tokens = tarr;
 	parser.pos = 0;
 
-	// Skip the EOF token at the start
-	parser_advance();
 	// Start parsing at the root note: the `Program` node
 	parser_program();
 }
