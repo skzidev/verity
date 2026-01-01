@@ -3,6 +3,15 @@
 #include <stdlib.h>
 #include <getopt.h>
 
+#define helpScreen "usage: verity [OPTIONS] <input files>\n" \
+    "ARGUMENTS:\n" \
+    "\t<input files> - The input file paths\n" \
+    "OPTIONS:\n" \
+    "\t--version,-v - Display version information and exit\n" \
+    "\t--silent,-s - Log nothing to stdout during compilation\n" \
+    "\t--help,-h - Show this help screen and exit\n"
+
+#pragma GCC diagnostic ignored "-Wunused-variable"
 static struct option long_opts[] = {
     { "version", no_argument, NULL, 'v' },
     { "silent", no_argument, NULL, 's' },

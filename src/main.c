@@ -48,6 +48,10 @@ int main(int argc, char *argv[]){
         printf("VerityC, version %s.\nImplementing Verity %s.\nLicensed under the MIT license.\n", COMPILER_VERSION, LANGUAGE_VERSION);
         exit(0);
     }
+    if(opts.help){
+        printf("%s", helpScreen);
+        exit(0);
+    }
 
 	// Read main source file
     fptr = fopen(opts.inputFiles[0], "r");

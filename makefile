@@ -19,7 +19,7 @@ $(BIN): $(SRC)
 	cppcheck $(SRC)
 	$(CC) $(CFLAGS) -o $@ $^
 
-bin/%: tests/unit/%.c src/lexer/lexer.c src/diags/diagnostics.c
+bin/%: tests/unit/%.c src/lexer/lexer.c src/diags/diagnostics.c src/config/config.c
 	cppcheck $(TEST_SRCS)
 	$(CC) $(CFLAGS) -o $@ $^
 
