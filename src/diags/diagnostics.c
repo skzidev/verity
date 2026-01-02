@@ -1,40 +1,33 @@
-#include <stdlib.h>
 #include "./diagnostics.h"
+#include <stdarg.h>
 
-void emitDiagnostic(const Diagnostic *d){
-	if(d->level == ERROR)
-	    printf("\e[1;31merror\e[0m [%s]: %s", d->code, d->message);
-	else if(d->level == WARNING)
-		printf("\e[1;33warning\e[0m [%s]: %s", d->code, d->message);
-	else if(d->level == NOTE)
-		printf("\e[1;34mnote\e[0m [%s]: %s", d->code, d->message);
-    printf(" (%s:%d:%d)\n", d->filename, d->line + 1, d->column + 1);
-    if(d->level == ERROR)
-		exit(1);
+__attribute__((format(printf, 3, 4)))
+void THROW(DiagnosticLevel level, char* code, char* fmt, ...){
+    va_list args;
+    va_start(args, fmt);
+    if(level == ERROR){
+	    printf("\e[1;31merror\e[0m [%s]: ", code);
+    } else if(level == WARNING){
+		printf("\e[1;33mwarning\e[0m [%s]: ", code);
+    } else if(level == NOTE){
+		printf("\e[1;34mnote\e[0m [%s]: ", code);
+    }
+    vprintf(fmt, args);
+    va_end(args);
 }
 
-void note(const char* msg, const char* fname, int line, int col){
-	Diagnostic diag;
-	diag.code = "UNTRACKED";
-	diag.message = msg;
-	diag.filename = fname;
-	diag.level = NOTE;
-	diag.line = line;
-	diag.column = col;
-	emitDiagnostic(&diag);
-}
-
-void errorAt(const char *code,
-              const char *msg,
-              const char *file,
-              int line,
-              int col){
-    Diagnostic diag;
-    diag.code = code;
-    diag.message = msg;
-    diag.filename = file;
-    diag.level = ERROR;
-    diag.line = line;
-    diag.column = col;
-    emitDiagnostic(&diag);
+__attribute__((format(printf, 6, 7)))
+void THROW_FROM_USER_CODE(DiagnosticLevel level, char* fname, int line, int col, char* code, char* fmt, ...){
+    va_list args;
+    va_start(args, fmt);
+    if(level == ERROR){
+	    printf("\e[1;31merror\e[0m [%s]: ", code);
+    } else if(level == WARNING){
+		printf("\e[1;33mwarning\e[0m [%s]: ", code);
+    } else if(level == NOTE){
+		printf("\e[1;34mnote\e[0m [%s]: ", code);
+    }
+    vprintf(fmt, args);
+    printf(" (%s:%d:%d)\n", fname, line + 1, col + 1);
+    va_end(args);
 }

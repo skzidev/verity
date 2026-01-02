@@ -12,7 +12,7 @@ typedef struct {
 	TokenArray* tokens;
 } Parser;
 
-extern const char* filename;
+extern char* filename;
 extern Parser parser;
 extern Token tok;
 

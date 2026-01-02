@@ -19,7 +19,7 @@ __     __        _ _
 #define BUILD_DATE __DATE__
 #define BUILD_TIME __TIME__
 
-#define COMPILER_VERSION "0."
+#define COMPILER_VERSION "0.1"
 #define LANGUAGE_VERSION "2025.0"
 
 FILE* fptr;
@@ -42,14 +42,18 @@ int main(int argc, char *argv[]){
 	// Read main source file
     fptr = fopen(opts.inputFiles[0], "r");
     fseek(fptr, 0, SEEK_END);
-    long size = ftell(fptr);
+    long size = ftell(fptr) + 1;
+    // +1 for termination byte
     fseek(fptr, 0, SEEK_SET);
 
     char* fcontent = (char*) malloc(size * sizeof(char));
     fread(fcontent, 1, size, fptr);
+    fcontent[size - 1] = '\0';
 
 	// Compile main file
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
+    //free(fcontent);
+    //fcontent = NULL;
 	parser_parse(&tokenStream, opts.inputFiles[0]);
 
     return 0;

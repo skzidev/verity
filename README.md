@@ -58,12 +58,17 @@ The Verity language uses a CalVer system, however: `{YEAR}.{COUNTER}`, where `{Y
 
 ## Roadmap
 
-[x] Args parser
-[x] Lexer
-[ ] Parser
-[ ] Semantic Analyzer
-[ ] Lowerer
-[ ] Integration with LLVM
+- [x] Args parser
+
+- [x] Lexer
+
+- [ ] Parser
+
+- [ ] Semantic Analyzer
+
+- [ ] Lowerer
+
+- [ ] Integration with LLVM
 
 ## License
 

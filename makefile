@@ -33,13 +33,14 @@ clean:
 test: $(TEST_BIN)
 	@python tests/tools/run.py
 
-lint: $(BIN)
-	@echo This command requires cppcheck to be installed.
+lint:
+	@echo "======= This command requires cppcheck to be installed. ======="
 	cppcheck $(SRC) $(TEST_SRCS)
 
 help:
 	@echo "Available Build Targets:"
 	@echo "\t- make / make all   Build the compiler"
 	@echo "\t- make run          Build and run"
-	@echo "\t- make test         Run tests"
+	@echo "\t- make test         Run the testing suite"
 	@echo "\t- make clean        Remove build artifacts"
+	@echo "\t- make lint         Check the code for warnings/errors"

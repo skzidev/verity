@@ -10,7 +10,7 @@ void TokenArray_push(TokenArray* array, Token tok){
 		array->capacity = array->capacity ? array->capacity * 2 : 16;
 		array->data = realloc(array->data, array->capacity * sizeof(Token));
 	}
-    // printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
+    //printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
 	array->data[array->count++] = tok;
 }
 
@@ -34,8 +34,10 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 
 	TokenArray tarr = {0};
 
+	int len = strlen(input);
+
 	int i = 0;
-	while(input[i] != '\0'){
+	while(i < len && input[i] != '\0'){
 		char currentChar = input[i];
 		column ++;
 
@@ -116,7 +118,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 					i ++;
 					column ++;
 					if(input[i] == '\n')
-						THROW_ERROR("L0001", "String literal must be terminated before a newline", fname, token);
+	                    THROW_FROM_USER_CODE(ERROR, fname, line, column, "L0001", "String literal must be terminated before a newline");
 				}
 				int strLen = i - strStart;
 				char *buffer = malloc(strLen + 1);
@@ -124,6 +126,8 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 				buffer[strLen] = '\0';
 				token.lexeme = buffer;
 				TokenArray_push(&tarr, token);
+				// free(buffer);
+				// buffer = NULL;
 				i ++;
 				column ++;
 				continue;
@@ -138,7 +142,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 				break;
 			default:
 				if(!isalnum(input[i]))
-					THROW_ERROR("L0002", "Unexpected token", fname, token);
+					THROW_FROM_USER_CODE(ERROR, fname, line, column, "L0002", "Unexpected token");
 				int start = i;
 				while(isalnum(input[i])){
 					i ++;
@@ -152,6 +156,8 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 
 				token.kind = lookup(buf);
 				TokenArray_push(&tarr, token);
+				// free(buf);
+				// buf = NULL;
 				continue;
 		}
 		TokenArray_push(&tarr, token);

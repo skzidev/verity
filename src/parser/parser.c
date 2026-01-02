@@ -1,12 +1,12 @@
 #include "./parser.h"
 #include <stdio.h>
-#include "../lexer/lexer.h"
-#include <string.h>
 #include <stdlib.h>
+#include "../diags/diagnostics.h"
+#include "../lexer/lexer.h"
 
 #pragma region Non-grammar specific
 
-const char* filename;
+char* filename;
 Parser parser;
 Token tok;
 
@@ -25,10 +25,15 @@ bool parser_accept(TokenKind s){
 bool parser_expect(TokenKind s){
 	if(parser_accept(s))
 		return true;
-	printf("%d:%d\n", tok.line, tok.column);
-	char* errorMessage = (char*) malloc((21 + strlen(tok.lexeme)) * sizeof(char));
-	sprintf(errorMessage, "unexpected symbol '%d'; expected '%d'", tok.kind, s);
-	THROW_ERROR("P0001", errorMessage, filename, tok);
+	printf("%s\n", tok.lexeme);
+	THROW_FROM_USER_CODE(ERROR,
+	    filename,
+		tok.line,
+		tok.column,
+		"P0001",
+		"unexpected token '%s'",
+		tok.lexeme
+	);
 	return false;
 }
 
@@ -61,20 +66,45 @@ typedef struct {
 } Parameter;
 
 typedef struct {
-    Parameter* start;
+    Parameter* data;
     int count;
     int capacity;
 } ParameterList;
 
-void parser_parameter_list(){
+void ParameterList_push(ParameterList* params, Parameter newItem){
+    if(params->count == params->capacity){
+        size_t newCapacity = params->capacity ? params->capacity * 2 : 16;
+        void* newData = realloc(params->data, newCapacity * sizeof(Parameter));
+
+        if(!newData){
+            THROW(ERROR, "P0003", "Failed to allocate space");
+            exit(1);
+        }
+
+        params->capacity = newCapacity;
+        params->data = newData;
+    }
+
+    params->data[params->count++] = newItem;
+}
+
+ParameterList parser_parameter_list(){
+    ParameterList stmt = {};
 	while(tok.kind == (TOK_IDENT) || tok.kind == TOK_MUT){
-		// consume another parameter
-		if(tok.kind == (TOK_MUT)){ parser_advance(); } // mut can be used here too
+		Parameter param = {};
+		if(tok.kind == (TOK_MUT)){
+		    param.mutable = true;
+			parser_advance();
+		}
+		param.type = tok.lexeme;
 		parser_expect(TOK_IDENT);
+		param.ident = tok.lexeme;
 		parser_expect(TOK_IDENT);
 		if(tok.kind == TOK_RPAREN) break;
 		parser_expect(TOK_COMMA);
+		ParameterList_push(&stmt, param);
 	}
+	return stmt;
 }
 
 typedef struct {
@@ -155,7 +185,7 @@ void parser_statement(){
 void parser_block(){
 	parser_expect(TOK_LBRACE);
 	while(tok.kind != (TOK_RBRACE)){
-	    // TODO implement statement
+	    parser_statement();
 	}
 	parser_expect(TOK_RBRACE);
 }
@@ -194,22 +224,24 @@ IdentifierList parser_throws_clause(){
 typedef struct {
     char* ident;
     bool recursive;
-    // TODO ParameterList params;
+    ParameterList params;
     ReturnsClause retClause;
     // TODO ThrowsClause exceptions;
     // TODO Block body;
 } ProcedureDefinition;
 
 ProcedureDefinition parser_procedure_definition(){
-    ProcedureDefinition stmt;
-	stmt.recursive = (tok.kind == (TOK_RECURSIVE));
-	parser_advance();
+    ProcedureDefinition stmt = {};
+    if(tok.kind == (TOK_RECURSIVE)){
+        stmt.recursive = true;
+        parser_advance();
+    }
 	parser_expect(TOK_PROC);
 	stmt.ident = tok.lexeme;
 	parser_expect(TOK_IDENT);
 	parser_expect(TOK_LPAREN);
 	if(tok.kind != (TOK_RPAREN)){
-		parser_parameter_list();
+		stmt.params = parser_parameter_list();
 	}
 	parser_expect(TOK_RPAREN);
 	stmt.retClause = parser_returns_clause();
@@ -229,11 +261,14 @@ typedef struct {
     char* ident;
     ParameterList params;
     char* retType;
-
+    IdentifierList errors;
 } ExternalProcedureDeclaration;
 
 typedef struct {
-
+    char* ident;
+    char* type;
+    Expression rhs;
+    bool mutable;
 } ExternalVariableDeclaration;
 
 typedef struct {
@@ -245,7 +280,7 @@ typedef struct {
 } ExternalDeclaration;
 
 ExternalDeclaration parser_external_declaration(){
-    ExternalDeclaration stmt;
+    ExternalDeclaration stmt = {};
 	// skip the "external" keyword
 	parser_advance();
 	if(tok.kind == TOK_PROC){
@@ -254,19 +289,26 @@ ExternalDeclaration parser_external_declaration(){
 		parser_expect(TOK_PROC);
 		parser_expect(TOK_IDENT);
 		parser_expect(TOK_LPAREN);
-		parser_parameter_list();
+		stmt.procDecl->params = parser_parameter_list();
 		parser_expect(TOK_RPAREN);
 		parser_returns_clause();
 		parser_expect(TOK_SEMI);
 	} else {
 	    stmt.type = EXTERNAL_VARIABLE_DECLARATION;
 		// external variable declaration
+		if(tok.kind == TOK_MUT){
+		    stmt.varDecl->mutable = true;
+			parser_advance();
+		}
+		stmt.varDecl->type = tok.lexeme;
 		parser_expect(TOK_IDENT);
 		// ^ type
+		stmt.varDecl->ident = tok.lexeme;
 		parser_expect(TOK_IDENT);
 		// ^ name
 		parser_expect(TOK_SEMI);
 	}
+	return stmt;
 }
 
 void parser_top_level_stmt(){
@@ -277,9 +319,9 @@ void parser_top_level_stmt(){
 	} else if(tok.kind == TOK_EXTERNAL) {
 		parser_external_declaration();
 	}
-	// TODO class definitions
+	// TODO class definitionss
 	else {
-		THROW_ERROR("P0002", "unexpected token in top-level statement", filename, tok);
+		THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0002", "unexpected token in top-level statement; did not exepect '%s'", tok.lexeme);
 	}
 }
 
