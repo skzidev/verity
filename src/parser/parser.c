@@ -54,6 +54,18 @@ ImportStatement parser_import_statement(){
 	return stmt;
 }
 
+typedef struct {
+    char* type;
+    char* ident;
+    bool mutable;
+} Parameter;
+
+typedef struct {
+    Parameter* start;
+    int count;
+    int capacity;
+} ParameterList;
+
 void parser_parameter_list(){
 	while(tok.kind == (TOK_IDENT) || tok.kind == TOK_MUT){
 		// consume another parameter
@@ -65,17 +77,34 @@ void parser_parameter_list(){
 	}
 }
 
-void parser_expression(){
+typedef struct {
+
+} Expression;
+
+Expression parser_expression(){
     // TODO implement
+    if(tok.kind == TOK_PROPAGATE){
+        parser_advance();
+    }
+    Expression stmt = {};
+    return stmt;
 }
+
+typedef struct {} BreakStatement;
 
 void parser_break_statement(){
     parser_expect(TOK_BREAK);
 }
 
+typedef struct {} SkipStatement;
+
 void parser_skip_statement(){
     parser_expect(TOK_SKIP);
 }
+
+typedef struct {
+    Expression expr;
+} ReturnStatement;
 
 void parser_return_statement(){
     parser_expect(TOK_RETURN);
@@ -83,23 +112,30 @@ void parser_return_statement(){
 }
 
 typedef struct {
-    const char* ident;
-    const char* type;
+    char* ident;
+    char* type;
     bool mutable;
-    // TODO Expression rhs;
+    Expression rhs;
 } VariableDefinition;
 
 VariableDefinition parser_variable_definition(){
-    VariableDefinition stmt;
-    stmt.mutable = (tok.kind == TOK_MUT); // Variable is mutable
+    VariableDefinition stmt = {
+        .mutable=false,
+    };
+    if(tok.kind == TOK_MUT){
+        stmt.mutable = true;
+        parser_advance();
+    }
     stmt.type = tok.lexeme;
     parser_expect(TOK_IDENT); // type
     stmt.ident = tok.lexeme;
     parser_expect(TOK_IDENT); // identifier
     parser_expect(TOK_ASSIGN);
-    parser_expression();
+    stmt.rhs = parser_expression();
     return stmt;
 }
+
+typedef struct {} Statement;
 
 void parser_statement(){
     if(tok.kind == TOK_RETURN){
@@ -136,12 +172,23 @@ ReturnsClause parser_returns_clause(){
 	return stmt;
 }
 
-void parser_throws_clause(){
+typedef struct {
+    char* start;
+    int count;
+    int capacity;
+} IdentifierList;
+
+IdentifierList parser_throws_clause(){
+    IdentifierList stmt = {
+        .capacity=0,
+        .count=0
+    };
 	parser_expect(TOK_THROWS);
 	while(tok.kind == (TOK_IDENT)){
 		parser_expect(TOK_IDENT);
 		parser_expect(TOK_COMMA);
 	}
+	return stmt;
 }
 
 typedef struct {
@@ -211,7 +258,7 @@ void parser_top_level_stmt(){
 
 void parser_program(){
     parser_advance();
-	while(tok.kind != (TOK_EOF)){ // note: EOF may not have been implemented yet?
+	while(tok.kind != (TOK_EOF)){
 		parser_top_level_stmt();
 	}
 }
@@ -224,6 +271,6 @@ void parser_parse(TokenArray* tarr, char* fname){
 	parser.tokens = tarr;
 	parser.pos = 0;
 
-	// Start parsing at the root note: the `Program` node
+	// Start parsing at the root node: the `Program` node
 	parser_program();
 }
