@@ -220,10 +220,36 @@ ProcedureDefinition parser_procedure_definition(){
 	return stmt;
 }
 
-void parser_external_declaration(){
+typedef enum {
+    EXTERNAL_PROC_DECLARATION,
+    EXTERNAL_VARIABLE_DECLARATION
+} ExternalDeclarationType;
+
+typedef struct {
+    char* ident;
+    ParameterList params;
+    char* retType;
+
+} ExternalProcedureDeclaration;
+
+typedef struct {
+
+} ExternalVariableDeclaration;
+
+typedef struct {
+    ExternalDeclarationType type;
+    union {
+        ExternalProcedureDeclaration *procDecl;
+        ExternalVariableDeclaration *varDecl;
+    };
+} ExternalDeclaration;
+
+ExternalDeclaration parser_external_declaration(){
+    ExternalDeclaration stmt;
 	// skip the "external" keyword
 	parser_advance();
 	if(tok.kind == TOK_PROC){
+	    stmt.type = EXTERNAL_PROC_DECLARATION;
 		// External procedure declaration
 		parser_expect(TOK_PROC);
 		parser_expect(TOK_IDENT);
@@ -233,6 +259,7 @@ void parser_external_declaration(){
 		parser_returns_clause();
 		parser_expect(TOK_SEMI);
 	} else {
+	    stmt.type = EXTERNAL_VARIABLE_DECLARATION;
 		// external variable declaration
 		parser_expect(TOK_IDENT);
 		// ^ type
