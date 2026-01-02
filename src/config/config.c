@@ -30,6 +30,7 @@ CompilerOptions ParseArgs(int argc, char **argv){
     }
 
     for(int i = optind; i < argc; i ++){
+        // TODO make opts.inputFiles a valid array
         opts.inputFiles = &argv[i];
     }
 

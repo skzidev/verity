@@ -50,6 +50,21 @@ python tests/tools/gen.py {type} {module}
 
 where `type` is either: `unit`, or `e2e` and `module` is the name of a module in the src folder.
 
+## Versioning
+
+This project uses an epoch versioning system: `{EPOCH}.{COUNTER}` where `{EPOCH}` is the epoch, and `{COUNTER}` is the release number within that epoch. Every build tag gets its own version number.
+
+The Verity language uses a CalVer system, however: `{YEAR}.{COUNTER}`, where `{YEAR}` is the gregorian year of the release, and `{COUNTER}` is the release number within that year.
+
+## Roadmap
+
+[x] Args parser
+[x] Lexer
+[ ] Parser
+[ ] Semantic Analyzer
+[ ] Lowerer
+[ ] Integration with LLVM
+
 ## License
 
 This project (VerityC, the C compiler implementation of Verity) alongside verity's specification is licensed under MIT. [See more](./LICENSE)

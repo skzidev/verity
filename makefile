@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -std=c11 -g
 
-RUNFLAGS := -v examples/main.vty
+RUNFLAGS := examples/main.vty
 
 SRC := $(wildcard src/*.c src/*/*.c)
 

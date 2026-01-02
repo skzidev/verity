@@ -10,33 +10,17 @@ __     __        _ _
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "./lexer/lexer.h"
 #include "./parser/parser.h"
 
 #include "./config/config.h"
 
-#include "diags/diagnostics.h"
+#define BUILD_DATE __DATE__
+#define BUILD_TIME __TIME__
 
-#define COMPILER_VERSION "0.0.1"
-#define LANGUAGE_VERSION "2025"
-
-// Define required positional arguments
-#define REQUIRED_ARGS \
-    REQUIRED_STRING_ARG(input_file, "input", "Input file path") \
-
-// Define optional arguments with defaults
-#define OPTIONAL_ARGS \
-	OPTIONAL_STRING_ARG(optimization, "0", "-O", "level", "The optimization level that should be used [0-3]") \
-	OPTIONAL_STRING_ARG(target, "x86-64", "-t", "architecture", "The target CPU architecture [x86-64,aarch64]") \
-	OPTIONAL_STRING_ARG(dump_ast, "./ast", "--dump-ast", "path", "Dump the AST to the provided file")
-
-// Define boolean flags
-#define BOOLEAN_ARGS \
-    BOOLEAN_ARG(help, "-h", "Show this help screen") \
-	BOOLEAN_ARG(version, "-v", "Display version information and exit") \
-	BOOLEAN_ARG(silent, "-s", "Log nothing to stdout")
+#define COMPILER_VERSION "0."
+#define LANGUAGE_VERSION "2025.0"
 
 FILE* fptr;
 
@@ -45,7 +29,9 @@ int main(int argc, char *argv[]){
 	CompilerOptions opts = ParseArgs(argc, argv);
 
     if(opts.version){
-        printf("VerityC, version %s.\nImplementing Verity %s.\nLicensed under the MIT license.\n", COMPILER_VERSION, LANGUAGE_VERSION);
+        printf("VerityC v%s (built %s at %s).\n" \
+            "Verity spec v%s.\n" \
+            "Licensed under MIT.\n", COMPILER_VERSION, BUILD_DATE, BUILD_TIME, LANGUAGE_VERSION);
         exit(0);
     }
     if(opts.help){

@@ -42,12 +42,16 @@ typedef struct {
     const char* ident;
 } ImportStatement;
 
-void parser_import_statement(){
+ImportStatement parser_import_statement(){
+    ImportStatement stmt;
 	parser_expect(TOK_IMPORT);
+	stmt.package = tok.lexeme;
 	parser_expect(TOK_STRING);
 	parser_expect(TOK_AS);
+	stmt.ident = tok.lexeme;
 	parser_expect(TOK_IDENT);
 	parser_expect(TOK_SEMI);
+	return stmt;
 }
 
 void parser_parameter_list(){
@@ -78,12 +82,23 @@ void parser_return_statement(){
     parser_expression();
 }
 
-void parser_variable_definition(){
-    if(tok.kind == TOK_MUT){} // Variable is mutable
+typedef struct {
+    const char* ident;
+    const char* type;
+    bool mutable;
+    // TODO Expression rhs;
+} VariableDefinition;
+
+VariableDefinition parser_variable_definition(){
+    VariableDefinition stmt;
+    stmt.mutable = (tok.kind == TOK_MUT); // Variable is mutable
+    stmt.type = tok.lexeme;
     parser_expect(TOK_IDENT); // type
+    stmt.ident = tok.lexeme;
     parser_expect(TOK_IDENT); // identifier
     parser_expect(TOK_ASSIGN);
     parser_expression();
+    return stmt;
 }
 
 void parser_statement(){
@@ -109,9 +124,16 @@ void parser_block(){
 	parser_expect(TOK_RBRACE);
 }
 
-void parser_returns_clause(){
-	parser_expect(TOK_RETURNS);
+typedef struct {
+    char* type;
+} ReturnsClause;
+
+ReturnsClause parser_returns_clause(){
+    ReturnsClause stmt;
+    parser_expect(TOK_RETURNS);
+    stmt.type = tok.lexeme;
 	parser_expect(TOK_IDENT);
+	return stmt;
 }
 
 void parser_throws_clause(){
@@ -122,20 +144,33 @@ void parser_throws_clause(){
 	}
 }
 
-void parser_procedure_definition(){
-	if(tok.kind == (TOK_RECURSIVE)){ parser_advance(); } // `recursive` keyword is optional
+typedef struct {
+    char* ident;
+    bool recursive;
+    // TODO ParameterList params;
+    ReturnsClause retClause;
+    // TODO ThrowsClause exceptions;
+    // TODO Block body;
+} ProcedureDefinition;
+
+ProcedureDefinition parser_procedure_definition(){
+    ProcedureDefinition stmt;
+	stmt.recursive = (tok.kind == (TOK_RECURSIVE));
+	parser_advance();
 	parser_expect(TOK_PROC);
+	stmt.ident = tok.lexeme;
 	parser_expect(TOK_IDENT);
 	parser_expect(TOK_LPAREN);
 	if(tok.kind != (TOK_RPAREN)){
 		parser_parameter_list();
 	}
 	parser_expect(TOK_RPAREN);
-	parser_returns_clause();
+	stmt.retClause = parser_returns_clause();
 	if(tok.kind == TOK_THROWS){
 		parser_throws_clause();
 	}
 	parser_block();
+	return stmt;
 }
 
 void parser_external_declaration(){
