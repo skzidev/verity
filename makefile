@@ -17,10 +17,12 @@ all: $(BIN) $(TEST_BIN)
 $(BIN): $(SRC)
 	@mkdir -p bin
 	cppcheck $(SRC)
+	clang-tidy $(SRC)
 	$(CC) $(CFLAGS) -o $@ $^
 
 bin/%: tests/unit/%.c src/lexer/lexer.c src/diags/diagnostics.c src/config/config.c
 	cppcheck $(TEST_SRCS)
+	clang-tidy $(TEST_SRCS)
 	$(CC) $(CFLAGS) -o $@ $^
 
 run: $(BIN)
@@ -36,6 +38,7 @@ test: $(TEST_BIN)
 lint:
 	@echo "======= This command requires cppcheck to be installed. ======="
 	cppcheck $(SRC) $(TEST_SRCS)
+	clang-tidy $(SRC) $(TEST_SRCS)
 
 help:
 	@echo "Available Build Targets:"

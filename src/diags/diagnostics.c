@@ -13,6 +13,7 @@ void THROW(DiagnosticLevel level, char* code, char* fmt, ...){
 		printf("\e[1;34mnote\e[0m [%s]: ", code);
     }
     vprintf(fmt, args);
+    printf("\n");
     va_end(args);
 }
 

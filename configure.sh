@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "checking required tools..."
 
-required_tools=("gcc" "ld" "make" "cppcheck" "python3")
+required_tools=("gcc" "ld" "make" "cppcheck" "clang-tidy" "python3")
 for tool in "${required_tools[@]}"; do
 	echo "checking for $tool"
 	if ! command -v "$tool" &> /dev/null; then
