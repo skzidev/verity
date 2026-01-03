@@ -20,3 +20,10 @@ extern void parser_parse(TokenArray* tarr, char* fname);
 extern void parser_advance();
 extern bool parser_accept(TokenKind s);
 extern bool parser_expect(TokenKind s);
+
+typedef struct Expression Expression;
+typedef struct PrimaryExpression PrimaryExpression;
+typedef struct UnaryExpression UnaryExpression;
+typedef struct MulExpression MulExpression;
+
+Expression* parser_expression();

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "../diags/diagnostics.h"
 #include "../lexer/lexer.h"
+#include <string.h>
 
 #pragma region Non-grammar specific
 
@@ -25,7 +26,6 @@ bool parser_accept(TokenKind s){
 bool parser_expect(TokenKind s){
 	if(parser_accept(s))
 		return true;
-	printf("%s\n", tok.lexeme);
 	THROW_FROM_USER_CODE(ERROR,
 	    filename,
 		tok.line,
@@ -107,16 +107,123 @@ ParameterList parser_parameter_list(){
 	return stmt;
 }
 
-typedef struct {
+typedef enum {
+    PRIMARY_STRING,
+    PRIMARY_IDENT,
+    PRIMARY_SUBEXPR
+} PrimaryKind;
 
-} Expression;
+struct PrimaryExpression {
+    PrimaryKind kind;
+    union {
+        char* string;
+        char* ident;
+        Expression* subexpr;
+        int integer;
+        float floatingPoint;
+    };
+};
 
-Expression parser_expression(){
+PrimaryExpression* parser_primary_expression(){
+    PrimaryExpression* expr = malloc(sizeof(PrimaryExpression));
+
+    switch(tok.kind){
+        case TOK_STRING:
+            expr->string = tok.lexeme;
+        break;
+        case TOK_IDENT:
+            expr->ident = tok.lexeme;
+        break;
+        case TOK_INT:
+            // TODO actually convert instead of cast
+            expr->integer = strtol(tok.lexeme, NULL, 10);
+        break;
+        case TOK_FLOAT:
+            expr->floatingPoint = strtof(tok.lexeme, NULL);
+        break;
+        default:
+            expr->subexpr = (parser_expression());
+        break;
+    }
+
+    return expr;
+}
+
+typedef enum {
+    UNARY_NOT,
+    UNARY_NEGATIVE
+    // TODO AddressOf w/ *
+    // TODO Dereference w/ &
+} UnaryOperator;
+
+struct UnaryExpression {
+    PrimaryExpression* rhs;
+    UnaryOperator operator;
+};
+
+UnaryExpression* parser_unary_expression(){
+    UnaryExpression* expr = malloc(sizeof(UnaryExpression));
+    if(tok.kind == TOK_EXCL)
+        expr->operator = UNARY_NOT;
+    else if (tok.kind == TOK_MINUS)
+        expr->operator = UNARY_NEGATIVE;
+    else THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0005", "unknown unary operator: '%s'", tok.lexeme);
+    parser_advance();
+    expr->rhs = parser_primary_expression();
+    return expr;
+}
+
+typedef enum {
+    MUL,
+    DIV
+} MultiplicativeOperator;
+
+struct MulExpression {
+    UnaryExpression* lhs;
+    UnaryExpression* rhs;
+    MultiplicativeOperator operator;
+};
+
+MulExpression* parser_mul_expression(){
+    MulExpression* expr = malloc(sizeof(MulExpression));
+    expr->lhs = parser_unary_expression();
+    // TODO make this all optional
+    if(tok.kind == TOK_STAR)
+        expr->operator = MUL;
+    else if(tok.kind == TOK_SLASH)
+        expr->operator = DIV;
+    else THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0004", "unknown operator '%s'", tok.lexeme);
+    expr->rhs = parser_unary_expression();
+    return expr;
+}
+
+struct Expression {
+    bool willPropogate;
+    MulExpression* lhs;
+    MulExpression* rhs;
+    union {
+        enum {
+            ADD, SUB
+        } operator;
+    };
+};
+
+Expression* parser_expression(){
     // TODO implement
+    Expression* stmt = malloc(sizeof(Expression));
     if(tok.kind == TOK_PROPAGATE){
+        stmt->willPropogate = true;
         parser_advance();
     }
-    Expression stmt = {};
+    stmt->lhs = parser_mul_expression();
+    // TODO make all other tokens optional
+    if(tok.kind == TOK_PLUS)
+        stmt->operator = ADD;
+    else if(tok.kind == TOK_MINUS)
+        stmt->operator = SUB;
+    else THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0004", "unknown operator '%s'", tok.lexeme);
+    parser_advance();
+    stmt->rhs = parser_mul_expression();
     return stmt;
 }
 
@@ -161,11 +268,17 @@ VariableDefinition parser_variable_definition(){
     stmt.ident = tok.lexeme;
     parser_expect(TOK_IDENT); // identifier
     parser_expect(TOK_ASSIGN);
-    stmt.rhs = parser_expression();
+    stmt.rhs = *parser_expression();
     return stmt;
 }
 
-typedef struct {} Statement;
+typedef struct {
+    union {
+        ReturnStatement retStmt;
+        BreakStatement breakStmt;
+        SkipStatement skipStmt;
+    };
+} Statement;
 
 void parser_statement(){
     if(tok.kind == TOK_RETURN){
