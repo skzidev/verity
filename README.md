@@ -28,6 +28,7 @@ Build requirements:
 - Make
 - Bash (or compatible; on Windows MSYS or Git Bash)
 - GCC
+- Clang-tidy
 - Cppcheck
 
 To build and run this project, run these commands:

@@ -6,7 +6,8 @@
 #include "../diags/diagnostics.h"
 
 void TokenArray_push(TokenArray* array, Token tok){
-	if(array->count == array->capacity){
+	if(tok.lexeme == NULL) return;
+    if(array->count == array->capacity){
 		array->capacity = array->capacity ? array->capacity * 2 : 16;
 		array->data = realloc(array->data, array->capacity * sizeof(Token));
 	}

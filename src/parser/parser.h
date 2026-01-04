@@ -20,10 +20,11 @@ extern void parser_parse(TokenArray* tarr, char* fname);
 extern void parser_advance();
 extern bool parser_accept(TokenKind s);
 extern bool parser_expect(TokenKind s);
+extern Token parser_peek(void);
+extern Token parser_peek_for(int lookahead);
 
-typedef struct Expression Expression;
-typedef struct PrimaryExpression PrimaryExpression;
-typedef struct UnaryExpression UnaryExpression;
-typedef struct MulExpression MulExpression;
+typedef struct ProcedureDefinition ProcedureDefinition;
+typedef struct ExternalDeclaration ExternalDeclaration;
 
-Expression* parser_expression();
+ProcedureDefinition* parser_procedure_definition();
+ExternalDeclaration* parser_external_declaration();

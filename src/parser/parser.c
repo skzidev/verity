@@ -4,6 +4,8 @@
 #include "../diags/diagnostics.h"
 #include "../lexer/lexer.h"
 #include <string.h>
+#include "exprParser/exprParser.h"
+#include "stmtParser/stmtParser.h"
 
 #pragma region Non-grammar specific
 
@@ -14,9 +16,6 @@ Token tok;
 void parser_advance(){
 	tok = parser.tokens->data[parser.pos ++];
 }
-
-Token parser_peek(void);
-Token parser_peek_for(int lookahead);
 
 Token parser_peek(void){
     return parser.tokens->data[parser.pos + 1];
@@ -45,6 +44,7 @@ bool parser_expect(TokenKind s){
 		"unexpected token '%s'",
 		tok.lexeme
 	);
+	exit(1);
 	return false;
 }
 
@@ -52,23 +52,6 @@ bool parser_expect(TokenKind s){
 #pragma region Grammar specific
 
 typedef struct {} Program;
-
-typedef struct {
-    const char* package;
-    const char* ident;
-} ImportStatement;
-
-ImportStatement parser_import_statement(){
-    ImportStatement stmt;
-	parser_expect(TOK_IMPORT);
-	stmt.package = tok.lexeme;
-	parser_expect(TOK_STRING);
-	parser_expect(TOK_AS);
-	stmt.ident = tok.lexeme;
-	parser_expect(TOK_IDENT);
-	parser_expect(TOK_SEMI);
-	return stmt;
-}
 
 typedef struct {
     char* type;
@@ -118,250 +101,17 @@ ParameterList parser_parameter_list(){
 	return stmt;
 }
 
-typedef enum {
-    PRIMARY_STRING,
-    PRIMARY_IDENT,
-    PRIMARY_SUBEXPR,
-    PRIMARY_INT,
-    PRIMARY_FLOAT
-} PrimaryKind;
-
-struct PrimaryExpression {
-    PrimaryKind kind;
-    union {
-        char* string;
-        char* ident;
-        Expression* subexpr;
-        int integer;
-        float floatingPoint;
-    };
-};
-
-PrimaryExpression* parser_primary_expression(){
-    PrimaryExpression* expr = malloc(sizeof(PrimaryExpression));
-
-    switch(tok.kind){
-        case TOK_STRING:
-            expr->kind = PRIMARY_STRING;
-            expr->string = tok.lexeme;
-        break;
-        case TOK_IDENT:
-            expr->kind = PRIMARY_IDENT;
-            expr->ident = tok.lexeme;
-        break;
-        case TOK_INT:
-            expr->kind = PRIMARY_INT;
-            expr->integer = strtol(tok.lexeme, NULL, 10);
-        break;
-        case TOK_FLOAT:
-            expr->kind = PRIMARY_FLOAT;
-            expr->floatingPoint = strtof(tok.lexeme, NULL);
-        break;
-        default:
-            expr->kind = PRIMARY_SUBEXPR;
-            expr->subexpr = (parser_expression());
-        break;
-    }
-
-    return expr;
-}
-
-typedef enum {
-    UNARY_NOT,
-    UNARY_NEGATIVE
-    // TODO AddressOf w/ *
-    // TODO Dereference w/ &
-} UnaryOperator;
-
-struct UnaryExpression {
-    PrimaryExpression* rhs;
-    UnaryOperator operator;
-};
-
-UnaryExpression* parser_unary_expression(){
-    UnaryExpression* expr = malloc(sizeof(UnaryExpression));
-    if(tok.kind == TOK_EXCL || tok.kind == TOK_MINUS){
-        if(tok.kind == TOK_EXCL)
-            expr->operator = UNARY_NOT;
-        else if (tok.kind == TOK_MINUS)
-            expr->operator = UNARY_NEGATIVE;
-        parser_advance();
-    }
-    expr->rhs = parser_primary_expression();
-    return expr;
-}
-
-typedef enum {
-    MUL,
-    DIV
-} MultiplicativeOperator;
-
-struct MulExpression {
-    UnaryExpression* lhs;
-    UnaryExpression* rhs;
-    MultiplicativeOperator operator;
-};
-
-MulExpression* parser_mul_expression(){
-    MulExpression* expr = malloc(sizeof(MulExpression));
-    expr->lhs = parser_unary_expression();
-    if(tok.kind == TOK_STAR || tok.kind == TOK_SLASH){
-        if(tok.kind == TOK_STAR)
-            expr->operator = MUL;
-        else if(tok.kind == TOK_SLASH)
-            expr->operator = DIV;
-        else THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0004", "unknown operator '%s'", tok.lexeme);
-        parser_advance();
-        expr->rhs = parser_unary_expression();
-    }
-    return expr;
-}
-
-struct Expression {
-    bool willPropogate;
-    MulExpression* lhs;
-    MulExpression* rhs;
-    union {
-        enum {
-            ADD, SUB
-        } operator;
-    };
-};
-
-Expression* parser_expression(){
-    Expression* stmt = malloc(sizeof(Expression));
-    if(tok.kind == TOK_PROPAGATE){
-        stmt->willPropogate = true;
-        parser_advance();
-    }
-    stmt->lhs = parser_mul_expression();
-    if(tok.kind == TOK_PLUS || tok.kind == TOK_MINUS){
-        if(tok.kind == TOK_PLUS)
-            stmt->operator = ADD;
-        else if(tok.kind == TOK_MINUS)
-            stmt->operator = SUB;
-        else THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0004", "unknown operator '%s'", tok.lexeme);
-        parser_advance();
-        stmt->rhs = parser_mul_expression();
-    }
-    return stmt;
-}
-
-typedef struct {} BreakStatement;
-
-void parser_break_statement(){
-    parser_expect(TOK_BREAK);
-}
-
-typedef struct {} SkipStatement;
-
-void parser_skip_statement(){
-    parser_expect(TOK_SKIP);
-}
-
-typedef struct {
-    Expression expr;
-} ReturnStatement;
-
-void parser_return_statement(){
-    parser_expect(TOK_RETURN);
-    parser_expression();
-}
-
-typedef struct {
-    char* ident;
-    char* type;
-    bool mutable;
-    Expression* rhs;
-} VariableDefinition;
-
-VariableDefinition parser_variable_definition(){
-    VariableDefinition stmt = {
-        .mutable=false,
-    };
-    if(tok.kind == TOK_MUT){
-        stmt.mutable = true;
-        parser_advance();
-    }
-    stmt.type = tok.lexeme;
-    parser_expect(TOK_IDENT); // type
-    stmt.ident = tok.lexeme;
-    parser_expect(TOK_IDENT); // identifier
-    parser_expect(TOK_ASSIGN);
-    stmt.rhs = parser_expression();
-    return stmt;
-}
-
-typedef struct {
-    char* ident;
-    Expression rhs;
-} Assignment;
-
-Assignment parser_assignment(){
-    Assignment stmt;
-    stmt.ident = tok.lexeme;
-    parser_expect(TOK_IDENT);
-    parser_expect(TOK_ASSIGN);
-    stmt.rhs = *parser_expression();
-    return stmt;
-}
-
-typedef enum {
-    RETURN,
-    BREAK,
-    SKIP,
-    VARIABLE_DEFINITION,
-    VARIABLE_ASSIGNMENT,
-} StatementKind;
-
-typedef struct {
-    StatementKind kind;
-    union {
-        ReturnStatement retStmt;
-        BreakStatement breakStmt;
-        SkipStatement skipStmt;
-        VariableDefinition varDefStmt;
-        Assignment varAsgnStmt;
-    };
-} Statement;
-
-void parser_statement(){
-    if(tok.kind == TOK_RETURN){
-        // return stmt
-        parser_return_statement();
-    } else if(tok.kind == TOK_BREAK) {
-        // break stmt
-        parser_break_statement();
-    } else if(tok.kind == TOK_SKIP){
-        // skip stmt
-        parser_skip_statement();
-    } else if(tok.kind == TOK_MUT
-        || (parser_peek_for(2).kind == TOK_ASSIGN
-            && parser_peek_for(1).kind == TOK_IDENT
-            && tok.kind == TOK_IDENT)){
-        // variable definition
-        parser_variable_definition();
-    } else if(tok.kind == TOK_IDENT && parser_peek().kind == TOK_ASSIGN){
-        // variable assignment
-        parser_assignment();
-    }
-    // TODO implement other types
-    parser_expect(TOK_SEMI);
-}
-
 typedef struct {
     // StatementList statements;
 
 } Block;
 
 void parser_block(){
-    THROW(NOTE, "UNTRACKED", "block start");
     parser_expect(TOK_LBRACE);
 	while(tok.kind != (TOK_RBRACE)){
 	    parser_statement();
 	}
 	parser_expect(TOK_RBRACE);
-	THROW(NOTE, "UNTRACKED", "block end");
 }
 
 typedef struct {
@@ -395,30 +145,30 @@ IdentifierList parser_throws_clause(){
 	return stmt;
 }
 
-typedef struct {
+struct ProcedureDefinition {
     char* ident;
     bool recursive;
     ParameterList params;
     ReturnsClause retClause;
     // TODO ThrowsClause exceptions;
     // TODO Block body;
-} ProcedureDefinition;
+};
 
-ProcedureDefinition parser_procedure_definition(){
-    ProcedureDefinition stmt = {};
+ProcedureDefinition* parser_procedure_definition(){
+    ProcedureDefinition* stmt = malloc(sizeof(ProcedureDefinition));
     if(tok.kind == (TOK_RECURSIVE)){
-        stmt.recursive = true;
+        stmt->recursive = true;
         parser_advance();
     }
 	parser_expect(TOK_PROC);
-	stmt.ident = tok.lexeme;
+	stmt->ident = tok.lexeme;
 	parser_expect(TOK_IDENT);
 	parser_expect(TOK_LPAREN);
 	if(tok.kind != (TOK_RPAREN)){
-		stmt.params = parser_parameter_list();
+		stmt->params = parser_parameter_list();
 	}
 	parser_expect(TOK_RPAREN);
-	stmt.retClause = parser_returns_clause();
+	stmt->retClause = parser_returns_clause();
 	if(tok.kind == TOK_THROWS){
 		parser_throws_clause();
 	}
@@ -441,62 +191,48 @@ typedef struct {
 typedef struct {
     char* ident;
     char* type;
-    Expression rhs;
+    Expression* rhs;
     bool mutable;
 } ExternalVariableDeclaration;
 
-typedef struct {
+struct ExternalDeclaration {
     ExternalDeclarationType type;
     union {
         ExternalProcedureDeclaration *procDecl;
         ExternalVariableDeclaration *varDecl;
     };
-} ExternalDeclaration;
+};
 
-ExternalDeclaration parser_external_declaration(){
-    ExternalDeclaration stmt = {};
+ExternalDeclaration* parser_external_declaration(){
+    ExternalDeclaration* stmt = malloc(sizeof(ExternalDeclaration));
 	// skip the "external" keyword
 	parser_advance();
 	if(tok.kind == TOK_PROC){
-	    stmt.type = EXTERNAL_PROC_DECLARATION;
+	    stmt->type = EXTERNAL_PROC_DECLARATION;
 		// External procedure declaration
 		parser_expect(TOK_PROC);
 		parser_expect(TOK_IDENT);
 		parser_expect(TOK_LPAREN);
-		stmt.procDecl->params = parser_parameter_list();
+		stmt->procDecl->params = parser_parameter_list();
 		parser_expect(TOK_RPAREN);
 		parser_returns_clause();
 		parser_expect(TOK_SEMI);
 	} else {
-	    stmt.type = EXTERNAL_VARIABLE_DECLARATION;
+	    stmt->type = EXTERNAL_VARIABLE_DECLARATION;
 		// external variable declaration
 		if(tok.kind == TOK_MUT){
-		    stmt.varDecl->mutable = true;
+		    stmt->varDecl->mutable = true;
 			parser_advance();
 		}
-		stmt.varDecl->type = tok.lexeme;
+		stmt->varDecl->type = tok.lexeme;
 		parser_expect(TOK_IDENT);
 		// ^ type
-		stmt.varDecl->ident = tok.lexeme;
+		stmt->varDecl->ident = tok.lexeme;
 		parser_expect(TOK_IDENT);
 		// ^ name
 		parser_expect(TOK_SEMI);
 	}
 	return stmt;
-}
-
-void parser_top_level_stmt(){
-	if(tok.kind == TOK_IMPORT){
-		parser_import_statement();
-	} else if(tok.kind == TOK_RECURSIVE || tok.kind == TOK_PROC){
-		parser_procedure_definition();
-	} else if(tok.kind == TOK_EXTERNAL) {
-		parser_external_declaration();
-	}
-	// TODO class definitionss
-	else {
-		THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0002", "unexpected token in top-level statement; did not exepect '%s'", tok.lexeme);
-	}
 }
 
 void parser_program(){

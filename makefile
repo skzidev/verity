@@ -3,7 +3,7 @@ CFLAGS := -Wall -Wextra -std=c11 -g
 
 RUNFLAGS := examples/main.vty
 
-SRC := $(wildcard src/*.c src/*/*.c)
+SRC := $(shell find src -name '*.c')
 
 BIN := bin/verity
 
@@ -17,7 +17,6 @@ all: $(BIN) $(TEST_BIN)
 $(BIN): $(SRC)
 	@mkdir -p bin
 	cppcheck $(SRC)
-	clang-tidy $(SRC)
 	$(CC) $(CFLAGS) -o $@ $^
 
 bin/%: tests/unit/%.c src/lexer/lexer.c src/diags/diagnostics.c src/config/config.c
@@ -36,9 +35,9 @@ test: $(TEST_BIN)
 	@python tests/tools/run.py
 
 lint:
-	@echo "======= This command requires cppcheck to be installed. ======="
+	@echo "======= This command requires cppcheck and clang-tidy to be installed. ======="
 	cppcheck $(SRC) $(TEST_SRCS)
-	clang-tidy $(SRC) $(TEST_SRCS)
+	clang-tidy $(SRC) $(TEST_SRCS) --fix-notes
 
 help:
 	@echo "Available Build Targets:"
