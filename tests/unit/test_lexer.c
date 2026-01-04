@@ -14,6 +14,7 @@ void test_lexer(const char* src, TokenKind expected[], int len){
 
 	TokenArray tarr = lexer_tokenize(src, "src.vty");
 
+	printf("asserting '%d' == '%ld'\n", len, tarr.count);
 	assert(tarr.count == (size_t)len && "returned count != expected count");
 
 	for(size_t i = 0; i < tarr.count; i ++){
