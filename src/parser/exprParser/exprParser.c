@@ -33,6 +33,7 @@ PrimaryExpression* parser_primary_expression(){
         case TOK_IDENT:
             expr->kind = PRIMARY_IDENT;
             expr->ident = tok.lexeme;
+            // TODO check if it's a call or an ident
             parser_advance();
         break;
         case TOK_INT:
