@@ -80,11 +80,47 @@ Assignment parser_assignment(){
 }
 
 typedef enum {
+    EQUALS,  // ==
+    NOT_EQUALS, // !=
+    LESSTHAN, // <
+    LESSTHANEQUALTO, // <=
+    MORETHAN, // >
+    MORETHANEQUALTO // >=
+} ConditionOperator;
+
+typedef struct {
+    Expression* lhs;
+    Expression* rhs;
+    ConditionOperator operator;
+} Condition;
+
+void parser_condition(){
+    Condition* cond = malloc(sizeof(Condition));
+    cond->lhs = parser_expression();
+    if(tok.kind == TOK_ASSIGN && parser_peek().kind == TOK_ASSIGN){
+        cond->operator = EQUALS;
+    } else if(tok.kind == TOK_EXCL && parser_peek().kind == TOK_ASSIGN){
+        cond->operator = NOT_EQUALS;
+    }
+    parser_advance();
+    cond->rhs = parser_expression();
+}
+
+void parser_if_statement(){
+    parser_expect(TOK_IF);
+    parser_expect(TOK_LPAREN);
+
+}
+
+typedef enum {
     RETURN,
     BREAK,
     SKIP,
     VARIABLE_DEFINITION,
     VARIABLE_ASSIGNMENT,
+    IF,
+    ELSEIF,
+    ELSE
 } StatementKind;
 
 struct Statement {
@@ -106,19 +142,27 @@ Statement* parser_statement(){
         parser_return_statement();
     } else if(tok.kind == TOK_BREAK) {
         // break stmt
+        stmt->kind = BREAK;
         parser_break_statement();
     } else if(tok.kind == TOK_SKIP){
         // skip stmt
+        stmt->kind = SKIP;
         parser_skip_statement();
     } else if(tok.kind == TOK_MUT
         || (parser_peek_for(2).kind == TOK_ASSIGN
             && parser_peek_for(1).kind == TOK_IDENT
             && tok.kind == TOK_IDENT)){
         // variable definition
+        stmt->kind = VARIABLE_DEFINITION;
         parser_variable_definition();
     } else if(tok.kind == TOK_IDENT && parser_peek().kind == TOK_ASSIGN){
         // variable assignment
+        stmt->kind = VARIABLE_ASSIGNMENT;
         parser_assignment();
+    } else if(tok.kind == TOK_IF){
+        // if statement
+        stmt->kind = IF;
+        parser_if_statement();
     }
     // TODO implement other types
     parser_expect(TOK_SEMI);
@@ -146,8 +190,10 @@ TopLevelStatement* parser_top_level_stmt(){
 	    stmt->kind = IMPORT;
 		stmt->imptStmt = parser_import_statement();
 	} else if(tok.kind == TOK_RECURSIVE || tok.kind == TOK_PROC){
+	    THROW(NOTE, "UNTRACKED", "proceure define start");
 	    stmt->kind = PROCEDURE_DEFINITION;
 		stmt->procDef = parser_procedure_definition();
+	    THROW(NOTE, "UNTRACKED", "proceure define end");
 	} else if(tok.kind == TOK_EXTERNAL) {
 	    stmt->kind = EXTERN_DECLARATION;
 		stmt->externStmt = parser_external_declaration();

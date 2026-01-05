@@ -106,12 +106,14 @@ typedef struct {
 
 } Block;
 
-void parser_block(){
+Block* parser_block(){
+    Block* block = malloc(sizeof(Block));
     parser_expect(TOK_LBRACE);
 	while(tok.kind != (TOK_RBRACE)){
 	    parser_statement();
 	}
 	parser_expect(TOK_RBRACE);
+	return block;
 }
 
 typedef struct {
@@ -140,7 +142,8 @@ IdentifierList parser_throws_clause(){
 	parser_expect(TOK_THROWS);
 	while(tok.kind == (TOK_IDENT)){
 		parser_expect(TOK_IDENT);
-		parser_expect(TOK_COMMA);
+		if(tok.kind == TOK_COMMA) parser_advance();
+		// TODO write IdentifierList_push
 	}
 	return stmt;
 }
@@ -150,8 +153,8 @@ struct ProcedureDefinition {
     bool recursive;
     ParameterList params;
     ReturnsClause retClause;
-    // TODO ThrowsClause exceptions;
-    // TODO Block body;
+    IdentifierList exceptions;
+    Block* body;
 };
 
 ProcedureDefinition* parser_procedure_definition(){
@@ -170,9 +173,9 @@ ProcedureDefinition* parser_procedure_definition(){
 	parser_expect(TOK_RPAREN);
 	stmt->retClause = parser_returns_clause();
 	if(tok.kind == TOK_THROWS){
-		parser_throws_clause();
+		stmt->exceptions = parser_throws_clause();
 	}
-	parser_block();
+	stmt->body = parser_block();
 	return stmt;
 }
 

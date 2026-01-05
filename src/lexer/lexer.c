@@ -10,7 +10,7 @@ void TokenArray_push(TokenArray* array, Token tok){
 		array->capacity = array->capacity ? array->capacity * 2 : 16;
 		array->data = realloc(array->data, array->capacity * sizeof(Token));
 	}
-    //printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
+    printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
 	array->data[array->count++] = tok;
 }
 
@@ -38,8 +38,8 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 
 	int i = 0;
 	while(i < len && input[i] != '\0'){
-		char currentChar = input[i];
 		column ++;
+		char currentChar = input[i];
 
 		// printf("(%c) l: %d, c: %d\n", currentChar, line, column);
 
@@ -51,7 +51,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 		switch(currentChar){
 			case '\n':
 				line ++;
-				column = 0;
+				column = 1;
 				i ++;
 				continue;
 			break;
@@ -76,10 +76,9 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 			case '\t':
 				i ++;
 				column += 4;
-				break;
+				continue;
 			case ' ':
 				i ++;
-				column ++;
 				continue;
 			case '+':
 				token.kind = TOK_PLUS;
