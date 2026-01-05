@@ -48,6 +48,7 @@ PrimaryExpression* parser_primary_expression(){
         default:
             expr->kind = PRIMARY_SUBEXPR;
             expr->subexpr = (parser_expression());
+            parser_advance();
         break;
     }
 
@@ -133,4 +134,36 @@ Expression* parser_expression(){
         stmt->rhs = parser_mul_expression();
     }
     return stmt;
+}
+
+struct ExpressionList {
+    Expression* data;
+    int count;
+    int capacity;
+};
+
+void ExpressionList_push(ExpressionList* params, Expression newItem){
+    if(params->count == params->capacity){
+        size_t newCapacity = params->capacity ? params->capacity * 2 : 16;
+        void* newData = realloc(params->data, newCapacity * sizeof(Expression));
+
+        if(!newData){
+            THROW(ERROR, "P0006", "Failed to allocate space");
+            exit(1);
+        }
+
+        params->capacity = newCapacity;
+        params->data = newData;
+    }
+
+    params->data[params->count++] = newItem;
+}
+
+ExpressionList* parser_expression_list(){
+    ExpressionList* list = malloc(sizeof(ExpressionList));
+    while(tok.kind != TOK_RPAREN){
+        ExpressionList_push(list, *parser_expression());
+        printf("%s", tok.lexeme);
+    }
+    return list;
 }

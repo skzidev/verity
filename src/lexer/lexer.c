@@ -10,7 +10,7 @@ void TokenArray_push(TokenArray* array, Token tok){
 		array->capacity = array->capacity ? array->capacity * 2 : 16;
 		array->data = realloc(array->data, array->capacity * sizeof(Token));
 	}
-    printf("token: %s @ %d:%d\n", tok.lexeme, tok.line + 1, tok.column);
+    printf("token: %s (of kind %d) @ %d:%d\n", tok.lexeme, tok.kind, tok.line + 1, tok.column);
 	array->data[array->count++] = tok;
 }
 
@@ -143,7 +143,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 				if(!isalnum(input[i]))
 					THROW_FROM_USER_CODE(ERROR, fname, line, column, "L0002", "Unexpected token");
 				int start = i;
-				while(isalnum(input[i])){
+				while(isalnum(input[i]) || input[i] == '.'){
 					i ++;
 					column ++;
 				}

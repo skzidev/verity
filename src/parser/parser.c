@@ -101,10 +101,10 @@ ParameterList parser_parameter_list(){
 	return stmt;
 }
 
-typedef struct {
+struct Block {
     // StatementList statements;
 
-} Block;
+};
 
 Block* parser_block(){
     Block* block = malloc(sizeof(Block));
