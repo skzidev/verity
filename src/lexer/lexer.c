@@ -41,8 +41,6 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 		column ++;
 		char currentChar = input[i];
 
-		// printf("(%c) l: %d, c: %d\n", currentChar, line, column);
-
 		Token token;
 		token.lexeme = &currentChar;
 		token.column = column;
@@ -75,7 +73,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 				break;
 			case '\t':
 				i ++;
-				column += 4;
+				column += 1;
 				continue;
 			case ' ':
 				i ++;

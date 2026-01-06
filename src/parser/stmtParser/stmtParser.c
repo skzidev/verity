@@ -132,10 +132,10 @@ IfStatement* parser_if_statement(){
     return stmt;
 }
 
-typedef struct {
+struct ProcedureCall {
     char* ident;
     ExpressionList* params;
-} ProcedureCall;
+};
 
 ProcedureCall* parser_procedure_call(){
     ProcedureCall* stmt = malloc(sizeof(ProcedureCall));

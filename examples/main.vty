@@ -11,9 +11,11 @@ proc readFile(string path) returns string throws FileNotFoundError {
 	return propagate fs.readAsText(path);
 }
 
-int x = 5;
-mut int y = 10;
-y = x / y;
+proc main() returns int {
+    int x = 5;
+    mut int y = 10;
+    y = x / y;
 
-print(add(x, y));
-print(readFile("./config.txt") handle FileNotFoundError as e => print(e));
+    print(add(x, y));
+    print(readFile("./config.txt") handle FileNotFoundError as e => print(e));
+}

@@ -41,8 +41,10 @@ bool parser_expect(TokenKind s){
 		tok.line,
 		tok.column,
 		"P0001",
-		"unexpected token '%s'",
-		tok.lexeme
+		"unexpected token '%s' (of internal kind %d); expected kind %d",
+		tok.lexeme,
+		tok.kind,
+		s
 	);
 	exit(1);
 	return false;

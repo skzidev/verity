@@ -1,5 +1,6 @@
 #include "./exprParser.h"
 #include "../parser.h"
+#include "../stmtParser/stmtParser.h"
 #include <stdlib.h>
 
 typedef enum {
@@ -7,6 +8,7 @@ typedef enum {
     PRIMARY_IDENT,
     PRIMARY_SUBEXPR,
     PRIMARY_INT,
+    PRIMARY_CALL,
     PRIMARY_FLOAT
 } PrimaryKind;
 
@@ -18,6 +20,7 @@ struct PrimaryExpression {
         Expression* subexpr;
         int integer;
         float floatingPoint;
+        ProcedureCall* call;
     };
 };
 
@@ -34,6 +37,11 @@ PrimaryExpression* parser_primary_expression(){
             expr->kind = PRIMARY_IDENT;
             expr->ident = tok.lexeme;
             // TODO check if it's a call or an ident
+            if(parser_peek_for(0).kind == TOK_LPAREN){
+                expr->call = parser_procedure_call();
+                expr->kind = PRIMARY_CALL;
+                break;
+            }
             parser_advance();
         break;
         case TOK_INT:
