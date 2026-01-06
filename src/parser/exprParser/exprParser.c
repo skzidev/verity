@@ -26,6 +26,7 @@ struct PrimaryExpression {
 
 PrimaryExpression* parser_primary_expression(){
     PrimaryExpression* expr = malloc(sizeof(PrimaryExpression));
+    printf("Parsing primary expr: %d\n", tok.kind);
 
     switch(tok.kind){
         case TOK_STRING:
@@ -54,10 +55,25 @@ PrimaryExpression* parser_primary_expression(){
             expr->floatingPoint = strtof(tok.lexeme, NULL);
             parser_advance();
         break;
-        default:
+        case TOK_LPAREN:
             expr->kind = PRIMARY_SUBEXPR;
             expr->subexpr = (parser_expression());
             parser_advance();
+        break;
+        case TOK_HANDLE:
+            // TODO handle stmts
+            parser_advance();
+        break;
+        default:
+            THROW_FROM_USER_CODE(
+                ERROR,
+                filename,
+                tok.line,
+                tok.column,
+                "P0007",
+                "Unknown expression type: '%d'",
+                tok.kind
+            );
         break;
     }
 
@@ -172,7 +188,21 @@ ExpressionList* parser_expression_list(){
     ExpressionList* list = malloc(sizeof(ExpressionList));
     while(tok.kind != TOK_RPAREN){
         ExpressionList_push(list, *parser_expression());
-        printf("%s", tok.lexeme);
+        if(tok.kind == TOK_RPAREN)
+            break;
+        else if(tok.kind == TOK_COMMA){
+            parser_advance();
+            continue;
+        } else THROW_FROM_USER_CODE(
+            ERROR,
+            filename,
+            tok.line,
+            tok.column,
+            "P0008",
+            "Unexpected argument delimiter: '%c' (internal kind %d)",
+            tok.lexeme,
+            tok.kind
+        );
     }
     return list;
 }

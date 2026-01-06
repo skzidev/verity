@@ -64,6 +64,7 @@ VariableDefinition parser_variable_definition(){
     }
     stmt.type = tok.lexeme;
     parser_expect(TOK_IDENT); // type
+    THROW(NOTE, "UNTRACKED", "variable define for %s start", tok.lexeme);
     stmt.ident = tok.lexeme;
     parser_expect(TOK_IDENT); // identifier
     parser_expect(TOK_ASSIGN);
@@ -188,13 +189,13 @@ Statement* parser_statement(){
         stmt->kind = SKIP;
         stmt->skipStmt = parser_skip_statement();
     } else if(tok.kind == TOK_MUT
-        || (parser_peek_for(2).kind == TOK_ASSIGN
-            && parser_peek_for(1).kind == TOK_IDENT
+        || (parser_peek_for(1).kind == TOK_ASSIGN
+            && parser_peek_for(0).kind == TOK_IDENT
             && tok.kind == TOK_IDENT)){
         // variable definition
         stmt->kind = VARIABLE_DEFINITION;
         stmt->varDefStmt = parser_variable_definition();
-    } else if(tok.kind == TOK_IDENT && parser_peek().kind == TOK_ASSIGN){
+    } else if(tok.kind == TOK_IDENT && parser_peek_for(0).kind == TOK_ASSIGN){
         // variable assignment
         stmt->varAsgnStmt = parser_assignment();
     } else if(tok.kind == TOK_IF){
@@ -233,10 +234,8 @@ TopLevelStatement* parser_top_level_stmt(){
 	    stmt->kind = IMPORT;
 		stmt->imptStmt = parser_import_statement();
 	} else if(tok.kind == TOK_RECURSIVE || tok.kind == TOK_PROC){
-	    THROW(NOTE, "UNTRACKED", "procedure define start");
 	    stmt->kind = PROCEDURE_DEFINITION;
 		stmt->procDef = parser_procedure_definition();
-	    THROW(NOTE, "UNTRACKED", "procedure define end");
 	} else if(tok.kind == TOK_EXTERNAL) {
 	    stmt->kind = EXTERN_DECLARATION;
 		stmt->externStmt = parser_external_declaration();
