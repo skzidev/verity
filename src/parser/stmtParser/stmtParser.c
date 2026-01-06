@@ -64,7 +64,6 @@ VariableDefinition parser_variable_definition(){
     }
     stmt.type = tok.lexeme;
     parser_expect(TOK_IDENT); // type
-    THROW(NOTE, "UNTRACKED", "variable define for %s start", tok.lexeme);
     stmt.ident = tok.lexeme;
     parser_expect(TOK_IDENT); // identifier
     parser_expect(TOK_ASSIGN);

@@ -31,7 +31,12 @@ int main(int argc, char *argv[]){
     if(opts.version){
         printf("VerityC v%s (built %s at %s).\n" \
             "Verity spec v%s.\n" \
-            "Licensed under MIT.\n", COMPILER_VERSION, BUILD_DATE, BUILD_TIME, LANGUAGE_VERSION);
+            "Licensed under MIT.\n",
+            COMPILER_VERSION,
+            BUILD_DATE,
+            BUILD_TIME,
+            LANGUAGE_VERSION
+        );
         exit(0);
     }
     if(opts.help){
@@ -43,7 +48,6 @@ int main(int argc, char *argv[]){
     fptr = fopen(opts.inputFiles[0], "r");
     fseek(fptr, 0, SEEK_END);
     long size = ftell(fptr) + 1;
-    // +1 for termination byte
     fseek(fptr, 0, SEEK_SET);
 
     char* fcontent = (char*) malloc(size * sizeof(char));
@@ -52,9 +56,12 @@ int main(int argc, char *argv[]){
 
 	// Compile main file
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
-    //free(fcontent);
-    //fcontent = NULL;
-	parser_parse(&tokenStream, opts.inputFiles[0]);
+    if(opts.verbose)
+        THROW(NOTE, "UNTRACKED", "Tokenization Complete");
+    parser_parse(&tokenStream, opts.inputFiles[0]);
+    if(opts.verbose)
+        THROW(NOTE, "UNTRACKED", "Parsing Complete");
+	// Token stream does not need to be used- free it
 
     return 0;
 }

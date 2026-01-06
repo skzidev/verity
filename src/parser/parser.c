@@ -53,7 +53,9 @@ bool parser_expect(TokenKind s){
 #pragma endregion
 #pragma region Grammar specific
 
-typedef struct {} Program;
+typedef struct {
+    StatementList* list;
+} Program;
 
 typedef struct {
     char* type;
@@ -104,8 +106,7 @@ ParameterList parser_parameter_list(){
 }
 
 struct Block {
-    // StatementList statements;
-
+    StatementList* statements;
 };
 
 Block* parser_block(){
@@ -240,11 +241,20 @@ ExternalDeclaration* parser_external_declaration(){
 	return stmt;
 }
 
-void parser_program(){
+struct StatementList {
+    int count;
+    int capacity;
+    Statement* data;
+};
+
+Program* parser_program(){
+    Program* prog = malloc(sizeof(Program));
+    prog->list = malloc(sizeof(StatementList));
     parser_advance();
 	while(tok.kind != (TOK_EOF)){
 		parser_top_level_stmt();
 	}
+	return prog;
 }
 
 #pragma endregion

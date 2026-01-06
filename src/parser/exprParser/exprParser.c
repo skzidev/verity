@@ -26,7 +26,6 @@ struct PrimaryExpression {
 
 PrimaryExpression* parser_primary_expression(){
     PrimaryExpression* expr = malloc(sizeof(PrimaryExpression));
-    printf("Parsing primary expr: %d\n", tok.kind);
 
     switch(tok.kind){
         case TOK_STRING:

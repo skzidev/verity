@@ -26,6 +26,7 @@ extern Token parser_peek_for(int lookahead);
 typedef struct ProcedureDefinition ProcedureDefinition;
 typedef struct ExternalDeclaration ExternalDeclaration;
 typedef struct Block Block;
+typedef struct StatementList StatementList;
 
 ProcedureDefinition* parser_procedure_definition();
 ExternalDeclaration* parser_external_declaration();

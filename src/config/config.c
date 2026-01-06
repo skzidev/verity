@@ -10,10 +10,11 @@ CompilerOptions ParseArgs(int argc, char **argv){
     opts.dumpAST = false;
     opts.silent = false;
     opts.help = false;
+    opts.verbose = false;
     opts.inputFiles = NULL;
 
     int opt;
-    while((opt = getopt_long(argc, argv, "vsh", long_opts, NULL)) != -1){
+    while((opt = getopt_long(argc, argv, "vshb", long_opts, NULL)) != -1){
         switch(opt){
             case 'v':
                 opts.version = true;
@@ -24,14 +25,22 @@ CompilerOptions ParseArgs(int argc, char **argv){
             case 'h':
                 opts.help = true;
                 break;
+            case 'b':
+                opts.verbose = true;
+                break;
             case '?':
                 exit(1);
         }
     }
 
     for(int i = optind; i < argc; i ++){
-        // TODO make opts.inputFiles a valid array
+        // TODO make opts.inputFiles a valid array-like structure
         opts.inputFiles = &argv[i];
+    }
+
+    if(opts.inputFiles == NULL){
+        // print help screen
+        opts.help = true;
     }
 
     return opts;
