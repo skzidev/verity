@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -std=c11 -g
 
-RUNFLAGS := examples/main.vty
+RUNFLAGS := -b examples/main.vty
 
 SRC := $(shell find src -name '*.c')
 
@@ -17,6 +17,7 @@ all: $(BIN) $(TEST_BIN)
 $(BIN): $(SRC)
 	@mkdir -p bin
 	cppcheck $(SRC)
+	clang-tidy $(SRC)
 	$(CC) $(CFLAGS) -o $@ $^
 
 bin/%: tests/unit/%.c src/lexer/lexer.c src/diags/diagnostics.c src/config/config.c

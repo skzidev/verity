@@ -10,4 +10,4 @@ Verity should be able to support interop through the C ABI as well, and should i
 
 ## Syntax
 
-Verity is designed to have a readible syntax,
+Verity is designed to have a readible syntax, and is designed to offer the programmer extra information, without being verbose.

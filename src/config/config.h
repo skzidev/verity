@@ -28,6 +28,8 @@ typedef struct {
     bool help;
     bool verbose;
 
+    bool shouldMute;
+
     char** inputFiles;
 } CompilerOptions;
 

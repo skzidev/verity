@@ -14,7 +14,7 @@ proc readFile(string path) returns string throws FileNotFoundError {
 proc main() returns int {
     int x = 5;
     mut int y = 10;
-    y = x / y;
+    y = y / x;
 
     print(add(x, y));
     print(readFile("./config.txt"));

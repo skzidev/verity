@@ -12,17 +12,19 @@ void test_argsparser(char* argv[], int argc, CompilerOptions expectedOpts){
 	assert(recievedOpts.dumpAST == expectedOpts.dumpAST);
 	assert(recievedOpts.help == expectedOpts.help);
 	assert(recievedOpts.version == expectedOpts.version);
+	assert(recievedOpts.silent == expectedOpts.silent);
 	// TODO ensure that input files list is the same
 }
 
 int main(){
-    char* set1[] = { "./path/to/file.vty", "--silent" };
+    char* set1[] = { "-b", "-s", "./path/to/file.vty" };
     const int len1 = 2;
     CompilerOptions expected1 = {
         .version=false,
         .dumpAST=false,
         .help=false,
-        .silent=true
+        .silent=true,
+        .verbose=true
     };
 
     test_argsparser(set1, len1, expected1);

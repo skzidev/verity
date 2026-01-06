@@ -23,10 +23,11 @@ __     __        _ _
 #define LANGUAGE_VERSION "2025.0"
 
 FILE* fptr;
+CompilerOptions opts;
 
 int main(int argc, char *argv[]){
 	// Read args
-	CompilerOptions opts = ParseArgs(argc, argv);
+	opts = ParseArgs(argc, argv);
 
     if(opts.version){
         printf("VerityC v%s (built %s at %s).\n" \
@@ -56,12 +57,11 @@ int main(int argc, char *argv[]){
 
 	// Compile main file
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
-    if(opts.verbose)
+    if(opts.shouldMute)
         THROW(NOTE, "UNTRACKED", "Tokenization Complete");
     parser_parse(&tokenStream, opts.inputFiles[0]);
-    if(opts.verbose)
+    if(opts.shouldMute)
         THROW(NOTE, "UNTRACKED", "Parsing Complete");
 	// Token stream does not need to be used- free it
-
     return 0;
 }

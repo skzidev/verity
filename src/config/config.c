@@ -43,5 +43,7 @@ CompilerOptions ParseArgs(int argc, char **argv){
         opts.help = true;
     }
 
+    opts.shouldMute = opts.verbose && !opts.silent;
+
     return opts;
 }
