@@ -54,10 +54,6 @@ bool parser_expect(TokenKind s){
 #pragma region Grammar specific
 
 typedef struct {
-    StatementList* list;
-} Program;
-
-typedef struct {
     char* type;
     char* ident;
     bool mutable;
@@ -111,9 +107,13 @@ struct Block {
 
 Block* parser_block(){
     Block* block = malloc(sizeof(Block));
+    block->statements = malloc(sizeof(StatementList));
+    block->statements->capacity = 0;
+    block->statements->count = 0;
+    block->statements->data = NULL;
     parser_expect(TOK_LBRACE);
 	while(tok.kind != (TOK_RBRACE)){
-	    parser_statement();
+	    StatementList_push(block->statements, parser_statement());
 	}
 	parser_expect(TOK_RBRACE);
 	return block;
@@ -241,30 +241,27 @@ ExternalDeclaration* parser_external_declaration(){
 	return stmt;
 }
 
-struct StatementList {
-    int count;
-    int capacity;
-    Statement* data;
-};
-
 Program* parser_program(){
     Program* prog = malloc(sizeof(Program));
-    prog->list = malloc(sizeof(StatementList));
+    prog->list = malloc(sizeof(TopLevelStatementList));
+    prog->list->capacity = 0;
+    prog->list->count = 0;
+    prog->list->data = NULL;
     parser_advance();
 	while(tok.kind != (TOK_EOF)){
-		parser_top_level_stmt();
+		TopLevelStatementList_push(prog->list, parser_top_level_stmt());
 	}
 	return prog;
 }
 
 #pragma endregion
 
-void parser_parse(TokenArray* tarr, char* fname){
+Program parser_parse(TokenArray* tarr, char* fname){
 	filename = fname;
 
 	parser.tokens = tarr;
 	parser.pos = 0;
 
 	// Start parsing at the root node: the `Program` node
-	parser_program();
+	return *parser_program();
 }

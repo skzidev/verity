@@ -59,9 +59,11 @@ int main(int argc, char *argv[]){
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
     if(opts.shouldMute)
         THROW(NOTE, "UNTRACKED", "Tokenization Complete");
-    parser_parse(&tokenStream, opts.inputFiles[0]);
-    if(opts.shouldMute)
+    Program ast = parser_parse(&tokenStream, opts.inputFiles[0]);
+    if(opts.shouldMute){
         THROW(NOTE, "UNTRACKED", "Parsing Complete");
-	// Token stream does not need to be used- free it
+    }
+	free(tokenStream.data);
+
     return 0;
 }

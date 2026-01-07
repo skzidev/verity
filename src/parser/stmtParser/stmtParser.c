@@ -212,6 +212,31 @@ Statement* parser_statement(){
     return stmt;
 }
 
+void StatementList_push(StatementList* stmts, Statement* newItem){
+    if(stmts->count == stmts->capacity){
+        int new_capacity = (stmts->capacity == 0) ? 4 : stmts->capacity * 2;
+
+        Statement *new_data = realloc(
+            stmts->data,
+            new_capacity * sizeof(Statement)
+        );
+
+        if(!new_data){
+            THROW(
+                ERROR,
+                "P0008",
+                "(internal) Memory allocation failed."
+            );
+            exit(1);
+        }
+
+        stmts->data = new_data;
+        stmts->capacity = new_capacity;
+    }
+    stmts->data[stmts->count] = *newItem;
+    stmts->count ++;
+}
+
 typedef enum {
     IMPORT,
     PROCEDURE_DEFINITION,
@@ -227,6 +252,31 @@ struct TopLevelStatement {
     };
 };
 
+void TopLevelStatementList_push(TopLevelStatementList* stmts, TopLevelStatement* newItem){
+    if(stmts->count == stmts->capacity){
+        int new_capacity = (stmts->capacity == 0) ? 4 : stmts->capacity * 2;
+
+        TopLevelStatement *new_data = realloc(
+            stmts->data,
+            new_capacity * sizeof(TopLevelStatement)
+        );
+
+        if(!new_data){
+            THROW(
+                ERROR,
+                "P0009",
+                "(internal) Memory allocation failed."
+            );
+            exit(1);
+        }
+
+        stmts->data = new_data;
+        stmts->capacity = new_capacity;
+    }
+    stmts->data[stmts->count] = *newItem;
+    stmts->count ++;
+}
+
 TopLevelStatement* parser_top_level_stmt(){
     TopLevelStatement* stmt = malloc(sizeof(TopLevelStatement));
 	if(tok.kind == TOK_IMPORT){
@@ -238,9 +288,7 @@ TopLevelStatement* parser_top_level_stmt(){
 	} else if(tok.kind == TOK_EXTERNAL) {
 	    stmt->kind = EXTERN_DECLARATION;
 		stmt->externStmt = parser_external_declaration();
-	}
-	// TODO class definitions
-	else {
+	} else {
 		THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0002", "unexpected token in top-level statement; did not exepect '%s'", tok.lexeme);
 	}
 	return stmt;
