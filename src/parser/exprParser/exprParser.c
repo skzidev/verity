@@ -171,7 +171,7 @@ void ExpressionList_push(ExpressionList* params, Expression newItem){
         size_t newCapacity = params->capacity ? params->capacity * 2 : 16;
         void* newData = realloc(params->data, newCapacity * sizeof(Expression));
 
-        if(!newData){
+        if(newData == NULL){
             THROW(ERROR, "P0006", "Failed to allocate space");
             exit(1);
         }
@@ -185,6 +185,9 @@ void ExpressionList_push(ExpressionList* params, Expression newItem){
 
 ExpressionList* parser_expression_list(){
     ExpressionList* list = malloc(sizeof(ExpressionList));
+    list->count = 0;
+    list->capacity = 0;
+    list->data = NULL;
     while(tok.kind != TOK_RPAREN){
         ExpressionList_push(list, *parser_expression());
         if(tok.kind == TOK_RPAREN)

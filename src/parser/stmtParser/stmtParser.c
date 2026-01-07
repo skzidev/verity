@@ -173,8 +173,10 @@ struct Statement {
 };
 
 Statement* parser_statement(){
+    bool shouldExpectSemi = true;
     // TODO convert to regex or some other more concrete matching
     Statement* stmt = malloc(sizeof(Statement));
+    stmt->kind = 0;
     if(tok.kind == TOK_RETURN){
         // return stmt
         stmt->kind = RETURN;
@@ -196,10 +198,12 @@ Statement* parser_statement(){
         stmt->varDefStmt = parser_variable_definition();
     } else if(tok.kind == TOK_IDENT && parser_peek_for(0).kind == TOK_ASSIGN){
         // variable assignment
+        stmt->kind = VARIABLE_ASSIGNMENT;
         stmt->varAsgnStmt = parser_assignment();
     } else if(tok.kind == TOK_IF){
         // if statement
         stmt->kind = IF;
+        shouldExpectSemi = false;
         stmt->ifStmt = parser_if_statement();
     } else if(tok.kind == TOK_IDENT && parser_peek_for(0).kind == TOK_LPAREN){
         // another weird bug fix
@@ -208,7 +212,8 @@ Statement* parser_statement(){
         stmt->call = parser_procedure_call();
     }
     // TODO implement other types of statements
-    parser_expect(TOK_SEMI);
+    if(shouldExpectSemi)
+        parser_expect(TOK_SEMI);
     return stmt;
 }
 
@@ -279,6 +284,7 @@ void TopLevelStatementList_push(TopLevelStatementList* stmts, TopLevelStatement*
 
 TopLevelStatement* parser_top_level_stmt(){
     TopLevelStatement* stmt = malloc(sizeof(TopLevelStatement));
+    stmt->kind = 0;
 	if(tok.kind == TOK_IMPORT){
 	    stmt->kind = IMPORT;
 		stmt->imptStmt = parser_import_statement();
@@ -292,4 +298,28 @@ TopLevelStatement* parser_top_level_stmt(){
 		THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0002", "unexpected token in top-level statement; did not exepect '%s'", tok.lexeme);
 	}
 	return stmt;
+}
+
+void parser_dump_node(TopLevelStatement* s){
+    switch(s->kind){
+        case IMPORT:
+            printf("\tIMPORT: mod=%s,ident=%s\n", s->imptStmt.package, s->imptStmt.ident);
+        break;
+        case EXTERN_DECLARATION:
+            printf("\tEXTERN: \n");
+        break;
+        case PROCEDURE_DEFINITION:
+            printf("\tPROCEDURE: ident=%s\n", "UNAVAILABLE");
+        break;
+        default:
+            THROW(ERROR, "P0010", "unknown top-level statement type '%d'", s->kind);
+        break;
+    }
+}
+
+void parser_dump_ast(Program ast){
+    printf("found %d child nodes:\n", ast.list->count);
+    for(long unsigned int i = 0; i < ast.list->count * sizeof(TopLevelStatement); i += sizeof(TopLevelStatement)){
+        parser_dump_node(&ast.list->data[i]);
+    }
 }
