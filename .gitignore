@@ -2,3 +2,4 @@ bin/*
 .vscode/*
 failed.log
 .zed/*
+examples/project

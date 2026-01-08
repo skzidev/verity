@@ -18,6 +18,8 @@ static struct option long_opts[] = {
     { "silent", no_argument, NULL, 's' },
     { "help", no_argument, NULL, 'h' },
     { "verbose", no_argument, NULL, 'b' },
+    { "log-tokens", no_argument, NULL, 0 },
+    { "log-ast", no_argument, NULL, 0 },
     { 0,0,0,0 }
 };
 

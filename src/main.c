@@ -63,8 +63,5 @@ int main(int argc, char *argv[]){
     if(opts.shouldMute)
         THROW(NOTE, "UNTRACKED", "Parsing Complete");
 
-    // walk the AST
-    parser_dump_ast(ast);
-
     return 0;
 }

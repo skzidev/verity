@@ -172,6 +172,27 @@ struct Statement {
     };
 };
 
+const char* stmt_kind_to_str(StatementKind stmtkind){
+    switch(stmtkind){
+        case RETURN:
+            return "RETURN";
+        case BREAK:
+            return "BREAK";
+        case SKIP:
+            return "SKIP";
+        case VARIABLE_DEFINITION:
+            return "VAR DEFINE";
+        case VARIABLE_ASSIGNMENT:
+            return "VAR ASSIGN";
+        case IF:
+            return "IF";
+        case PROCEDURE_CALL:
+            return "CALL";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 Statement* parser_statement(){
     bool shouldExpectSemi = true;
     // TODO convert to regex or some other more concrete matching
@@ -211,6 +232,7 @@ Statement* parser_statement(){
         stmt->kind = PROCEDURE_CALL;
         stmt->call = parser_procedure_call();
     }
+    printf("\t\tSTATEMENT: kind=%s\n", stmt_kind_to_str(stmt->kind));
     // TODO implement other types of statements
     if(shouldExpectSemi)
         parser_expect(TOK_SEMI);
@@ -288,8 +310,10 @@ TopLevelStatement* parser_top_level_stmt(){
 	if(tok.kind == TOK_IMPORT){
 	    stmt->kind = IMPORT;
 		stmt->imptStmt = parser_import_statement();
+		printf("\tIMPORT: mod=%s,ident=%s\n", stmt->imptStmt.package, stmt->imptStmt.ident);
 	} else if(tok.kind == TOK_RECURSIVE || tok.kind == TOK_PROC){
 	    stmt->kind = PROCEDURE_DEFINITION;
+		printf("\tPROCEDURE: ident=%s\n", parser_peek_for(0).lexeme);
 		stmt->procDef = parser_procedure_definition();
 	} else if(tok.kind == TOK_EXTERNAL) {
 	    stmt->kind = EXTERN_DECLARATION;
@@ -298,28 +322,4 @@ TopLevelStatement* parser_top_level_stmt(){
 		THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0002", "unexpected token in top-level statement; did not exepect '%s'", tok.lexeme);
 	}
 	return stmt;
-}
-
-void parser_dump_node(TopLevelStatement* s){
-    switch(s->kind){
-        case IMPORT:
-            printf("\tIMPORT: mod=%s,ident=%s\n", s->imptStmt.package, s->imptStmt.ident);
-        break;
-        case EXTERN_DECLARATION:
-            printf("\tEXTERN: \n");
-        break;
-        case PROCEDURE_DEFINITION:
-            printf("\tPROCEDURE: ident=%s\n", "UNAVAILABLE");
-        break;
-        default:
-            THROW(ERROR, "P0010", "unknown top-level statement type '%d'", s->kind);
-        break;
-    }
-}
-
-void parser_dump_ast(Program ast){
-    printf("found %d child nodes:\n", ast.list->count);
-    for(long unsigned int i = 0; i < ast.list->count * sizeof(TopLevelStatement); i += sizeof(TopLevelStatement)){
-        parser_dump_node(&ast.list->data[i]);
-    }
 }

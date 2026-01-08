@@ -24,6 +24,25 @@ struct PrimaryExpression {
     };
 };
 
+const char* expr_kind_to_string(PrimaryKind k){
+    switch(k){
+        case PRIMARY_STRING:
+            return "STRING LITERAL";
+        case PRIMARY_IDENT:
+            return "IDENTIFIER";
+        case PRIMARY_SUBEXPR:
+            return "SUBEXPRESSION";
+        case PRIMARY_INT:
+            return "INTEGER LITERAL";
+        case PRIMARY_CALL:
+            return "METHOD CALL";
+        case PRIMARY_FLOAT:
+            return "FLOAT LITERAL";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 PrimaryExpression* parser_primary_expression(){
     PrimaryExpression* expr = malloc(sizeof(PrimaryExpression));
 
@@ -75,6 +94,8 @@ PrimaryExpression* parser_primary_expression(){
             );
         break;
     }
+
+    printf("\t\t\tEXPRESSION: kind=%s\n", expr_kind_to_string(expr->kind));
 
     return expr;
 }

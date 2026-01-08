@@ -28,7 +28,7 @@ TokenKind lookup(const char* keyword){
 		return TOK_IDENT;
 }
 
-TokenArray lexer_tokenize(const char* input, char* fname){
+TokenArray lexer_tokenize(char* input, char* fname){
 	int line = 0;
 	int column = 0;
 
@@ -42,7 +42,7 @@ TokenArray lexer_tokenize(const char* input, char* fname){
 		char currentChar = input[i];
 
 		Token token;
-		token.lexeme = &currentChar;
+		token.lexeme = &input[i];
 		token.column = column;
 		token.line = line;
 

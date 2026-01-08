@@ -7,7 +7,7 @@ proc add(int a, int b) returns int {
 proc readFile(string path) returns string throws FileNotFoundError {
 	if(path != "./config.txt"){
 		print("somebody tweaked the code");
-	};
+	}
 	return propagate fs.readAsText(path);
 }
 

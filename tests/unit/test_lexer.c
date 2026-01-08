@@ -7,7 +7,7 @@
 #define RUN_TEST(source, expected) \
 	test_lexer(source, expected, sizeof(expected)/sizeof(expected[0]))
 
-void test_lexer(const char* src, TokenKind expected[], int len){
+void test_lexer(char* src, TokenKind expected[], int len){
 	// Define your unit testing logic here
 
 	printf("running test for source: `%s`\n", src);
@@ -28,10 +28,10 @@ void test_lexer(const char* src, TokenKind expected[], int len){
 int main(){
 	// Define arguments for your test here
 	TokenKind set1[] = { TOK_MUT, TOK_IDENT, TOK_IDENT, TOK_ASSIGN, TOK_INT, TOK_SEMI, TOK_EOF };
-	const char* source1 = "mut int x = 0;";
+	char* source1 = "mut int x = 0;";
 
 	TokenKind set2[] = { TOK_IMPORT, TOK_STRING, TOK_AS, TOK_IDENT, TOK_SEMI, TOK_EOF };
-	const char* source2 = "import \"std/fs\" as fs;";
+	char* source2 = "import \"std/fs\" as fs;";
 
 	// Run the test here
 	RUN_TEST(source1, set1);

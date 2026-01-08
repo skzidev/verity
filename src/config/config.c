@@ -16,6 +16,9 @@ CompilerOptions ParseArgs(int argc, char **argv){
     int opt;
     while((opt = getopt_long(argc, argv, "vshb", long_opts, NULL)) != -1){
         switch(opt){
+            case 0:
+                // only long argument
+                break;
             case 'v':
                 opts.version = true;
                 break;

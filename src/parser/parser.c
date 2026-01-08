@@ -191,7 +191,6 @@ typedef struct {
     char* ident;
     ParameterList params;
     char* retType;
-    IdentifierList errors;
 } ExternalProcedureDeclaration;
 
 typedef struct {
@@ -212,16 +211,17 @@ struct ExternalDeclaration {
 ExternalDeclaration* parser_external_declaration(){
     ExternalDeclaration* stmt = malloc(sizeof(ExternalDeclaration));
 	// skip the "external" keyword
-	parser_advance();
+	parser_expect(TOK_EXTERNAL);
 	if(tok.kind == TOK_PROC){
 	    stmt->type = EXTERNAL_PROC_DECLARATION;
 		// External procedure declaration
 		parser_expect(TOK_PROC);
+		stmt->procDecl->ident = tok.lexeme;
 		parser_expect(TOK_IDENT);
 		parser_expect(TOK_LPAREN);
 		stmt->procDecl->params = parser_parameter_list();
 		parser_expect(TOK_RPAREN);
-		parser_returns_clause();
+		stmt->procDecl->retType = parser_returns_clause().type;
 		parser_expect(TOK_SEMI);
 	} else {
 	    stmt->type = EXTERNAL_VARIABLE_DECLARATION;
