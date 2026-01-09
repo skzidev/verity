@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "../../src/lexer/lexer.h"
 
+bool lexer_shouldLog = false;
+
 #define RUN_TEST(source, expected) \
 	test_lexer(source, expected, sizeof(expected)/sizeof(expected[0]))
 

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdbool.h>
+
+extern bool lexer_shouldLog;
 
 /**
  * A list of token types

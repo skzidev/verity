@@ -1,6 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "lexer.h"
 
 #include "../diags/diagnostics.h"
@@ -10,8 +11,10 @@ void TokenArray_push(TokenArray* array, Token tok){
 		array->capacity = array->capacity ? array->capacity * 2 : 16;
 		array->data = realloc(array->data, array->capacity * sizeof(Token));
 	}
-    // printf("token: %s (of kind %d) @ %d:%d\n", tok.lexeme, tok.kind, tok.line + 1, tok.column);
-	array->data[array->count++] = tok;
+    if(lexer_shouldLog)
+        printf("token: %s (of kind %d) @ %d:%d\n", tok.lexeme, tok.kind, tok.line + 1, tok.column);
+
+    array->data[array->count++] = tok;
 }
 
 TokenKind lookup(const char* keyword){
@@ -42,7 +45,7 @@ TokenArray lexer_tokenize(char* input, char* fname){
 		char currentChar = input[i];
 
 		Token token;
-		token.lexeme = &input[i];
+		token.lexeme = &currentChar;
 		token.column = column;
 		token.line = line;
 

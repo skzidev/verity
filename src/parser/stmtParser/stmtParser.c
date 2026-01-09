@@ -232,7 +232,8 @@ Statement* parser_statement(){
         stmt->kind = PROCEDURE_CALL;
         stmt->call = parser_procedure_call();
     }
-    printf("\t\tSTATEMENT: kind=%s\n", stmt_kind_to_str(stmt->kind));
+    if(parser_shouldLog)
+        printf("\t\tSTATEMENT: kind=%s\n", stmt_kind_to_str(stmt->kind));
     // TODO implement other types of statements
     if(shouldExpectSemi)
         parser_expect(TOK_SEMI);
@@ -310,13 +311,17 @@ TopLevelStatement* parser_top_level_stmt(){
 	if(tok.kind == TOK_IMPORT){
 	    stmt->kind = IMPORT;
 		stmt->imptStmt = parser_import_statement();
-		printf("\tIMPORT: mod=%s,ident=%s\n", stmt->imptStmt.package, stmt->imptStmt.ident);
+		if(parser_shouldLog)
+		    printf("\tIMPORT: mod=%s,ident=%s\n", stmt->imptStmt.package, stmt->imptStmt.ident);
 	} else if(tok.kind == TOK_RECURSIVE || tok.kind == TOK_PROC){
 	    stmt->kind = PROCEDURE_DEFINITION;
-		printf("\tPROCEDURE: ident=%s\n", parser_peek_for(0).lexeme);
+		if(parser_shouldLog)
+		    printf("\tPROCEDURE: ident=%s\n", parser_peek_for(0).lexeme);
 		stmt->procDef = parser_procedure_definition();
 	} else if(tok.kind == TOK_EXTERNAL) {
 	    stmt->kind = EXTERN_DECLARATION;
+		if(parser_shouldLog)
+		    printf("EXTERNAL: \n");
 		stmt->externStmt = parser_external_declaration();
 	} else {
 		THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0002", "unexpected token in top-level statement; did not exepect '%s'", tok.lexeme);

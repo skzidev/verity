@@ -95,7 +95,8 @@ PrimaryExpression* parser_primary_expression(){
         break;
     }
 
-    printf("\t\t\tEXPRESSION: kind=%s\n", expr_kind_to_string(expr->kind));
+    if(parser_shouldLog)
+        printf("\t\t\tEXPRESSION: kind=%s\n", expr_kind_to_string(expr->kind));
 
     return expr;
 }

@@ -3,6 +3,8 @@
 #include "./stmtParser/stmtParser.h"
 #include <stdbool.h>
 
+extern bool parser_shouldLog;
+
 typedef struct {
 	size_t pos;
 	TokenArray* tokens;

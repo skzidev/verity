@@ -10,17 +10,21 @@ __     __        _ _
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
 #include "./lexer/lexer.h"
 #include "./parser/parser.h"
 
 #include "./config/config.h"
+#include "./globals.h"
 
 #define BUILD_DATE __DATE__
 #define BUILD_TIME __TIME__
 
 #define COMPILER_VERSION "0.1"
 #define LANGUAGE_VERSION "2025.0"
+
+bool lexer_shouldLog = false;
+bool parser_shouldLog = false;
 
 FILE* fptr;
 CompilerOptions opts;
@@ -44,6 +48,9 @@ int main(int argc, char *argv[]){
         printf("%s", helpScreen);
         exit(0);
     }
+
+    lexer_shouldLog = opts.dumpToks;
+    parser_shouldLog = opts.dumpAST;
 
 	// Read main source file
     fptr = fopen(opts.inputFiles[0], "r");

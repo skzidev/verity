@@ -11,14 +11,13 @@ CompilerOptions ParseArgs(int argc, char **argv){
     opts.silent = false;
     opts.help = false;
     opts.verbose = false;
+    opts.dumpAST = false;
+    opts.dumpToks = false;
     opts.inputFiles = NULL;
 
     int opt;
     while((opt = getopt_long(argc, argv, "vshb", long_opts, NULL)) != -1){
         switch(opt){
-            case 0:
-                // only long argument
-                break;
             case 'v':
                 opts.version = true;
                 break;
@@ -30,6 +29,12 @@ CompilerOptions ParseArgs(int argc, char **argv){
                 break;
             case 'b':
                 opts.verbose = true;
+                break;
+            case 1000:
+                opts.dumpToks = true;
+                break;
+            case 1001:
+                opts.dumpAST = true;
                 break;
             case '?':
                 exit(1);

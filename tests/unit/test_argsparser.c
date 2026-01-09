@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "../../src/config/config.h"
 
+bool lexer_shouldLog;
+
 void test_argsparser(char* argv[], int argc, CompilerOptions expectedOpts){
 	// Add your test logic here
 	CompilerOptions recievedOpts = ParseArgs(argc, argv);
