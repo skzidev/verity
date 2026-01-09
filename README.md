@@ -1,6 +1,6 @@
-<!-- <img src="./assets/Verity.png" style="border-radius: 20px;" /> -->
+<img src="./assets/Verity.png" style="border-radius: 20px;" />
 
-# Verity Compiler
+<h1 style="text-align: center;">The Verity Programming Language</h1>
 
  ![GitHub language count](https://img.shields.io/github/languages/count/skzidev/verity?style=for-the-badge)
  ![GitHub top language](https://img.shields.io/github/languages/top/skzidev/verity?style=for-the-badge)
@@ -11,15 +11,25 @@
 Verity is an AOT-compiled programming language, designed to maximize readability and DevEx.
 
 ```
+import "std/fs" as fs;
+
 proc add(int a, int b) returns int {
     return a + b;
 }
 
-int x = 5;
-mut int y = 10;
-y = x + y;
+proc readFile(string path) returns string throws FileNotFoundError {
+	return propagate fs.readAsText(path);
+}
 
-print(add(x, y));
+proc main() returns int {
+    int x = 5;
+    mut int y = 10;
+    y = y / x;
+
+    print(add(x, y));
+    print(readFile("./config.txt"));
+}
+
 ```
 
 ## Building

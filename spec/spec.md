@@ -20,6 +20,18 @@ proc main() returns int {
 }
 ```
 
+## Imports and modules
+
+In Verity, each file is a module which can contain two types of symbols: public and private. All symbols, unless declared as public, are private by default.
+
+Imports are written like this:
+```
+import "x" as y;
+```
+where x is the module name, and y is the identifier the module should be imported as.
+
+
+
 ## Notes
 
 - Functions are values
