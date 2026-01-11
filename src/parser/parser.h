@@ -37,14 +37,6 @@ typedef struct {
 extern Program parser_parse(TokenArray* tarr, char* fname);
 extern void parser_dump_ast(Program ast);
 
-struct ExternalDeclaration {
-    ExternalDeclarationType type;
-    union {
-        ExternalProcedureDeclaration *procDecl;
-        ExternalVariableDeclaration *varDecl;
-    };
-};
-
 ProcedureDefinition* parser_procedure_definition();
 ExternalDeclaration* parser_external_declaration();
 Block* parser_block();

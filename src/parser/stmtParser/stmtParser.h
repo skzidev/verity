@@ -134,6 +134,16 @@ typedef struct {
     bool mutable;
 } ExternalVariableDeclaration;
 
+typedef struct ExternalDeclaration ExternalDeclaration;
+
+struct ExternalDeclaration {
+    ExternalDeclarationType type;
+    union {
+        ExternalProcedureDeclaration *procDecl;
+        ExternalVariableDeclaration *varDecl;
+    };
+};
+
 typedef enum {
     IMPORT,
     PROCEDURE_DEFINITION,

@@ -71,9 +71,9 @@ void ParameterList_push(ParameterList* params, Parameter newItem){
 }
 
 ParameterList parser_parameter_list(){
-    ParameterList stmt = {};
+    ParameterList stmt = {0};
 	while(tok.kind == (TOK_IDENT) || tok.kind == TOK_MUT){
-		Parameter param = {};
+		Parameter param = {0};
 		if(tok.kind == (TOK_MUT)){
 		    param.mutable = true;
 			parser_advance();

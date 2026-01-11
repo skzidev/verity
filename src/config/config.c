@@ -1,7 +1,6 @@
 #include <stdbool.h>
-#include <getopt.h>
+#include "getopt.h"
 #include "config.h"
-#include <bits/getopt_core.h>
 
 CompilerOptions ParseArgs(int argc, char **argv){
     CompilerOptions opts;
