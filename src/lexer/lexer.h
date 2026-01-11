@@ -10,31 +10,55 @@ extern bool lexer_shouldLog;
  * These include keywords, punctuation, and operators.
  */
 typedef enum {
+    // C-style string termination byte, tokenized
 	TOK_EOF,
+	// Identifier
 	TOK_IDENT,
+	// Integer Literal
 	TOK_INT,
+	// Floating-point literal
 	TOK_FLOAT,
+	// String literal
 	TOK_STRING,
 
 	// Keywords
+	// Procedure definition/declaration
 	TOK_PROC,
+	// Returns clause
 	TOK_RETURNS,
+	// Throws clause
 	TOK_THROWS,
+	// Mutablility marker
 	TOK_MUT,
+	// If keyword
 	TOK_IF,
+	// else keyword
 	TOK_ELSE,
+	// while keyword
 	TOK_WHILE,
+	// for keyword
 	TOK_FOR,
+	// return statement
 	TOK_RETURN,
+	// propagate keyword
 	TOK_PROPAGATE,
+	// skip statment
 	TOK_SKIP,
+	// break statement
 	TOK_BREAK,
+	// throw statement
 	TOK_THROW,
+	// recursive marker
 	TOK_RECURSIVE,
+	// switch statement
 	TOK_SWITCH,
+	// handle statement
 	TOK_HANDLE,
+	// import statement
 	TOK_IMPORT,
+	// as keyword
 	TOK_AS,
+	// external marker
 	TOK_EXTERNAL,
 
 	// Symbols
@@ -46,7 +70,10 @@ typedef enum {
 	TOK_PLUS, TOK_MINUS,
 	TOK_STAR, TOK_SLASH,
 	TOK_RARR, TOK_LARR,
-	TOK_EXCL
+	TOK_EXCL,
+	// Boolean literal
+	TOK_BOOL,
+	TOK_NULL
 } TokenKind;
 
 typedef struct {
@@ -73,6 +100,7 @@ typedef struct {
  */
 #pragma GCC diagnostic ignored "-Wunused-variable"
 static Keyword keywords[] = {
+    // Syntactic keywords
 	{"proc", TOK_PROC},
 	{"propagate", TOK_PROPAGATE},
 	{"throws", TOK_THROWS},
@@ -91,7 +119,11 @@ static Keyword keywords[] = {
 	{"throw", TOK_THROW},
 	{"import", TOK_IMPORT},
 	{"as", TOK_AS},
-	{"external", TOK_EXTERNAL}
+	{"external", TOK_EXTERNAL},
+	// Literal keywords
+	{"true", TOK_BOOL},
+	{"false", TOK_BOOL},
+	{"null", TOK_NULL}
 };
 
 TokenKind lookup(const char* keyword);

@@ -13,8 +13,7 @@ __     __        _ _
 #include <stdbool.h>
 
 #include "./lexer/lexer.h"
-#include "./parser/parser.h"
-#include "./semantic/semantic.h"
+#include "./diags/diagnostics.h"
 
 #include "./config/config.h"
 #include "./globals.h"
@@ -68,11 +67,6 @@ int main(int argc, char *argv[]){
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
     if(opts.shouldMute)
         THROW(NOTE, "UNTRACKED", "Lexical Analysis Complete");
-    Program ast = parser_parse(&tokenStream, opts.inputFiles[0]);
-    free(tokenStream.data);
-    if(opts.shouldMute)
-        THROW(NOTE, "UNTRACKED", "Parsing Complete");
-    semantics_analyze(ast);
 
     return 0;
 }
