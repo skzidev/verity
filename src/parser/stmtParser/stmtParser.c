@@ -3,11 +3,6 @@
 #include <stdlib.h>
 #include "stmtParser.h"
 
-struct ImportStatement {
-    const char* package;
-    const char* ident;
-};
-
 ImportStatement parser_import_statement(){
     ImportStatement stmt;
 	parser_expect(TOK_IMPORT);
@@ -20,15 +15,11 @@ ImportStatement parser_import_statement(){
 	return stmt;
 }
 
-typedef struct {} BreakStatement;
-
 BreakStatement* parser_break_statement(){
     BreakStatement* stmt = malloc(sizeof(BreakStatement));
     parser_expect(TOK_BREAK);
     return stmt;
 }
-
-typedef struct {} SkipStatement;
 
 SkipStatement* parser_skip_statement(){
     SkipStatement* stmt = malloc(sizeof(SkipStatement));
@@ -36,23 +27,12 @@ SkipStatement* parser_skip_statement(){
     return stmt;
 }
 
-typedef struct {
-    Expression* expr;
-} ReturnStatement;
-
 ReturnStatement* parser_return_statement(){
     ReturnStatement* stmt = malloc(sizeof(ReturnStatement));
     parser_expect(TOK_RETURN);
     stmt->expr = parser_expression();
     return stmt;
 }
-
-typedef struct {
-    char* ident;
-    char* type;
-    bool mutable;
-    Expression* rhs;
-} VariableDefinition;
 
 VariableDefinition parser_variable_definition(){
     VariableDefinition stmt = {
@@ -71,11 +51,6 @@ VariableDefinition parser_variable_definition(){
     return stmt;
 }
 
-typedef struct {
-    char* ident;
-    Expression* rhs;
-} Assignment;
-
 Assignment parser_assignment(){
     Assignment stmt;
     stmt.ident = tok.lexeme;
@@ -84,21 +59,6 @@ Assignment parser_assignment(){
     stmt.rhs = parser_expression();
     return stmt;
 }
-
-typedef enum {
-    EQUALS,  // ==
-    NOT_EQUALS, // !=
-    LESSTHAN, // <
-    LESSTHANEQUALTO, // <=
-    MORETHAN, // >
-    MORETHANEQUALTO // >=
-} ConditionOperator;
-
-typedef struct {
-    Expression* lhs;
-    Expression* rhs;
-    ConditionOperator operator;
-} Condition;
 
 Condition* parser_condition(){
     Condition* cond = malloc(sizeof(Condition));
@@ -117,11 +77,6 @@ Condition* parser_condition(){
     return cond;
 }
 
-typedef struct {
-    Condition* cond;
-    Block* body;
-} IfStatement;
-
 IfStatement* parser_if_statement(){
     IfStatement* stmt = malloc(sizeof(IfStatement));
     parser_expect(TOK_IF);
@@ -132,11 +87,6 @@ IfStatement* parser_if_statement(){
     return stmt;
 }
 
-struct ProcedureCall {
-    char* ident;
-    ExpressionList* params;
-};
-
 ProcedureCall* parser_procedure_call(){
     ProcedureCall* stmt = malloc(sizeof(ProcedureCall));
     stmt->ident = tok.lexeme;
@@ -146,31 +96,6 @@ ProcedureCall* parser_procedure_call(){
     parser_expect(TOK_RPAREN);
     return stmt;
 }
-
-typedef enum {
-    RETURN,
-    BREAK,
-    SKIP,
-    VARIABLE_DEFINITION,
-    VARIABLE_ASSIGNMENT,
-    IF,
-    ELSEIF,
-    ELSE,
-    PROCEDURE_CALL
-} StatementKind;
-
-struct Statement {
-    StatementKind kind;
-    union {
-        ReturnStatement* retStmt;
-        BreakStatement* breakStmt;
-        SkipStatement* skipStmt;
-        VariableDefinition varDefStmt;
-        Assignment varAsgnStmt;
-        IfStatement* ifStmt;
-        ProcedureCall* call;
-    };
-};
 
 const char* stmt_kind_to_str(StatementKind stmtkind){
     switch(stmtkind){
@@ -265,21 +190,6 @@ void StatementList_push(StatementList* stmts, Statement* newItem){
     stmts->count ++;
 }
 
-typedef enum {
-    IMPORT,
-    PROCEDURE_DEFINITION,
-    EXTERN_DECLARATION
-} TopLevelStatementType;
-
-struct TopLevelStatement {
-    TopLevelStatementType kind;
-    union {
-        ImportStatement imptStmt;
-        ProcedureDefinition* procDef;
-        ExternalDeclaration* externStmt;
-    };
-};
-
 void TopLevelStatementList_push(TopLevelStatementList* stmts, TopLevelStatement* newItem){
     if(stmts->count == stmts->capacity){
         int new_capacity = (stmts->capacity == 0) ? 4 : stmts->capacity * 2;
@@ -321,7 +231,7 @@ TopLevelStatement* parser_top_level_stmt(){
 	} else if(tok.kind == TOK_EXTERNAL) {
 	    stmt->kind = EXTERN_DECLARATION;
 		if(parser_shouldLog)
-		    printf("EXTERNAL: \n");
+		    printf("\tEXTERNAL: \n");
 		stmt->externStmt = parser_external_declaration();
 	} else {
 		THROW_FROM_USER_CODE(ERROR, filename, tok.line, tok.column, "P0002", "unexpected token in top-level statement; did not exepect '%s'", tok.lexeme);

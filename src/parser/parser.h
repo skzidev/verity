@@ -1,3 +1,4 @@
+#pragma once
 #include "../diags/diagnostics.h"
 #include "../lexer/lexer.h"
 #include "./stmtParser/stmtParser.h"
@@ -25,11 +26,24 @@ typedef struct ProcedureDefinition ProcedureDefinition;
 typedef struct ExternalDeclaration ExternalDeclaration;
 typedef struct Block Block;
 
+
+struct Block {
+    StatementList* statements;
+};
+
 typedef struct {
     TopLevelStatementList* list;
 } Program;
 extern Program parser_parse(TokenArray* tarr, char* fname);
 extern void parser_dump_ast(Program ast);
+
+struct ExternalDeclaration {
+    ExternalDeclarationType type;
+    union {
+        ExternalProcedureDeclaration *procDecl;
+        ExternalVariableDeclaration *varDecl;
+    };
+};
 
 ProcedureDefinition* parser_procedure_definition();
 ExternalDeclaration* parser_external_declaration();
