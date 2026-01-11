@@ -5,6 +5,7 @@
 
 typedef struct {
     bool canRecurse;
+    bool isPublic;
     char* ident;
     ParameterList params;
     char* returnType;

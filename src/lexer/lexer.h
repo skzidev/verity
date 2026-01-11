@@ -60,6 +60,8 @@ typedef enum {
 	TOK_AS,
 	// external marker
 	TOK_EXTERNAL,
+	// public keyword
+	TOK_PUBLIC,
 
 	// Symbols
 	TOK_LPAREN, TOK_RPAREN,
@@ -120,6 +122,7 @@ static Keyword keywords[] = {
 	{"import", TOK_IMPORT},
 	{"as", TOK_AS},
 	{"external", TOK_EXTERNAL},
+	{"public", TOK_PUBLIC},
 	// Literal keywords
 	{"true", TOK_BOOL},
 	{"false", TOK_BOOL},

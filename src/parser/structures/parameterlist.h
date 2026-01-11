@@ -4,6 +4,7 @@
 typedef struct {
     char* type;
     char* ident;
+    bool isMutable;
 } Parameter;
 
 Parameter parser_Parameter();

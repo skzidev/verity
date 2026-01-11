@@ -7,6 +7,10 @@
 
 ProcedureDefinition parser_ProcedureDefinition(){
     ProcedureDefinition stmt = {0};
+    if(tok.kind == TOK_PUBLIC){
+        stmt.isPublic = true;
+        parser_expect(TOK_PUBLIC);
+    }
     if(tok.kind == TOK_RECURSIVE){
         stmt.canRecurse = true;
         parser_expect(TOK_RECURSIVE);
@@ -33,6 +37,40 @@ ImportStatement parser_ImportStatement(){
     return stmt;
 }
 
+External_ProcedureDeclaration parser_ExternalProcdef(){
+    External_ProcedureDeclaration stmt = {0};
+    parser_expect(TOK_PROC);
+    stmt.ident = tok.lexeme;
+    parser_expect(TOK_IDENT);
+    parser_expect(TOK_LPAREN);
+    // TODO parser_identifierList()
+    parser_expect(TOK_RPAREN);
+    // TODO parser_block()
+    return stmt;
+}
+
+External_VariableDeclaration parser_ExternalVariableDecl(){
+    External_VariableDeclaration decl = {0};
+    decl.type = tok.lexeme;
+    parser_expect(TOK_IDENT);
+    decl.ident = tok.lexeme;
+    parser_expect(TOK_IDENT);
+    return decl;
+}
+
+ExternalDeclaration parser_ExternalDeclaration(){
+    ExternalDeclaration decl = {0};
+    parser_expect(TOK_EXTERNAL);
+    if(tok.kind == TOK_PROC){
+        decl.kind = EXTERNAL_PROCDECL;
+        decl.procDecl = parser_ExternalProcdef();
+    } else {
+        decl.kind = EXTERNAL_VARIABLEDECL;
+        decl.varDecl = parser_ExternalVariableDecl();
+    }
+    return decl;
+}
+
 TopLevelStatement parser_TopLevelStatement(){
     TopLevelStatement stmt = {0};
     if(tok.kind == TOK_IMPORT){
@@ -53,6 +91,8 @@ TopLevelStatement parser_TopLevelStatement(){
             "P0003",
             "unable to derive top-level kind from token '%s' (kind %d)",
             tok.lexeme,
-            tok.kind);
+            tok.kind
+        );
     }
+    return stmt;
 }

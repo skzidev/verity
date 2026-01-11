@@ -12,7 +12,7 @@ external_procedure_declaration = "external" "proc" identifier "(" parameter_list
 external_variable_declaration = "external" identifier identifier ";";
 
 import_statement = "import" identifier "as" identifier ";";
-procedure_definition = "recursive"? "proc" identifier "(" parameter_list? ")" returns_clause throws_clause? block;
+procedure_definition = "public"? "recursive"? "proc" identifier "(" parameter_list? ")" returns_clause throws_clause? block;
 
 class_definition = "class" identfier "(" parameter_list? ")" class_block;
 

@@ -13,6 +13,10 @@ void ParameterList_push(ParameterList* list, Parameter item){
 
 Parameter parser_Parameter(){
     Parameter param = {0};
+    if(tok.kind == TOK_MUT){
+        param.isMutable = true;
+        parser_expect(TOK_MUT);
+    }
     param.type = tok.lexeme;
     parser_expect(TOK_IDENT);
     param.ident = tok.lexeme;
