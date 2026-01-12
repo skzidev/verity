@@ -1,5 +1,5 @@
 #pragma once
-#include "toplevel/toplevel.h"
+#include "../toplevel/toplevel.h"
 
 typedef struct {
     TopLevelStatement* data;
@@ -7,3 +7,5 @@ typedef struct {
     int capacity;
     char* entrypoint;
 } Program;
+
+void Program_appendToplevel(Program* prog, TopLevelStatement stmt);

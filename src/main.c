@@ -31,6 +31,18 @@ bool parser_shouldLog = false;
 FILE* fptr;
 CompilerOptions opts;
 
+char* readFileToString(char* fname){
+    fptr = fopen(fname, "r");
+    fseek(fptr, 0, SEEK_END);
+    long size = ftell(fptr) + 1;
+    fseek(fptr, 0, SEEK_SET);
+
+    char* fcontent = (char*) malloc(size * sizeof(char));
+    fread(fcontent, 1, size, fptr);
+    fcontent[size - 1] = '\0';
+    return fcontent;
+}
+
 int main(int argc, char *argv[]){
 	// Read args
 	opts = ParseArgs(argc, argv);
@@ -55,24 +67,19 @@ int main(int argc, char *argv[]){
     parser_shouldLog = opts.dumpAST;
 
 	// Read main source file
-    fptr = fopen(opts.inputFiles[0], "r");
-    fseek(fptr, 0, SEEK_END);
-    long size = ftell(fptr) + 1;
-    fseek(fptr, 0, SEEK_SET);
+	char* fcontent = readFileToString(opts.inputFiles[0]);
 
-    char* fcontent = (char*) malloc(size * sizeof(char));
-    fread(fcontent, 1, size, fptr);
-    fcontent[size - 1] = '\0';
-
-	// Compile main file
+	// get tokens
 	if(opts.verbose)
 	    THROW(NOTE, no_code, "Starting Lexical Analysis");
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
     if(opts.verbose)
         THROW(NOTE, no_code, "Lexical Analysis Complete");
+
+    // parse token stream -> ast
     if(opts.verbose)
         THROW(NOTE, no_code, "Starting Structural Analysis");
-    parser_Parse(tokenStream, opts.inputFiles[0]);
+    Program ast = parser_Parse(tokenStream, opts.inputFiles[0]);
     if(opts.verbose)
         THROW(NOTE, no_code, "Structural Analysis Complete");
 
