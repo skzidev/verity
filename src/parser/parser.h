@@ -1,36 +1,21 @@
-#include "../diags/diagnostics.h"
+#pragma once
 #include "../lexer/lexer.h"
-#include "./stmtParser/stmtParser.h"
-#include <stdbool.h>
-
-extern bool parser_shouldLog;
+#include "./structures/program.h"
+#include "expressions/expression.h"
 
 typedef struct {
-	size_t pos;
-	TokenArray* tokens;
+    TokenArray input;
+    size_t pos;
 } Parser;
 
+void parser_advance();
+
 extern char* filename;
-extern Parser parser;
 extern Token tok;
+extern Parser parser;
 
-extern void parser_advance();
-extern bool parser_accept(TokenKind s);
-extern bool parser_expect(TokenKind s);
-extern Token parser_peek(void);
-extern Token parser_peek_for(int lookahead);
-extern void parser_dump_node(TopLevelStatement* s);
+void parser_advance();
+Token parser_peek(int lookahead);
+void parser_expect(TokenKind s);
 
-typedef struct ProcedureDefinition ProcedureDefinition;
-typedef struct ExternalDeclaration ExternalDeclaration;
-typedef struct Block Block;
-
-typedef struct {
-    TopLevelStatementList* list;
-} Program;
-extern Program parser_parse(TokenArray* tarr, char* fname);
-extern void parser_dump_ast(Program ast);
-
-ProcedureDefinition* parser_procedure_definition();
-ExternalDeclaration* parser_external_declaration();
-Block* parser_block();
+Program parser_Parse(TokenArray stream, char* fname);

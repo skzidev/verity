@@ -13,11 +13,11 @@ __     __        _ _
 #include <stdbool.h>
 
 #include "./lexer/lexer.h"
-#include "./parser/parser.h"
-#include "./semantic/semantic.h"
+#include "./diags/diagnostics.h"
 
 #include "./config/config.h"
 #include "./globals.h"
+#include "./parser/parser.h"
 
 #define BUILD_DATE __DATE__
 #define BUILD_TIME __TIME__
@@ -30,6 +30,18 @@ bool parser_shouldLog = false;
 
 FILE* fptr;
 CompilerOptions opts;
+
+char* readFileToString(char* fname){
+    fptr = fopen(fname, "r");
+    fseek(fptr, 0, SEEK_END);
+    long size = ftell(fptr) + 1;
+    fseek(fptr, 0, SEEK_SET);
+
+    char* fcontent = (char*) malloc(size * sizeof(char));
+    fread(fcontent, 1, size, fptr);
+    fcontent[size - 1] = '\0';
+    return fcontent;
+}
 
 int main(int argc, char *argv[]){
 	// Read args
@@ -55,23 +67,21 @@ int main(int argc, char *argv[]){
     parser_shouldLog = opts.dumpAST;
 
 	// Read main source file
-    fptr = fopen(opts.inputFiles[0], "r");
-    fseek(fptr, 0, SEEK_END);
-    long size = ftell(fptr) + 1;
-    fseek(fptr, 0, SEEK_SET);
+	char* fcontent = readFileToString(opts.inputFiles[0]);
 
-    char* fcontent = (char*) malloc(size * sizeof(char));
-    fread(fcontent, 1, size, fptr);
-    fcontent[size - 1] = '\0';
-
-	// Compile main file
+	// get tokens
+	if(opts.verbose)
+	    THROW(NOTE, no_code, "Starting Lexical Analysis");
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
-    if(!opts.shouldMute)
-        THROW(NOTE, "UNTRACKED", "Lexical Analysis Complete");
-    Program ast = parser_parse(&tokenStream, opts.inputFiles[0]);
-    free(tokenStream.data);
-    if(!opts.shouldMute)
-        THROW(NOTE, "UNTRACKED", "Parsing Complete");
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Lexical Analysis Complete");
+
+    // parse token stream -> ast
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Starting Structural Analysis");
+    Program ast = parser_Parse(tokenStream, opts.inputFiles[0]);
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Structural Analysis Complete");
 
     return 0;
 }

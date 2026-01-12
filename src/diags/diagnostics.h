@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#define no_code "UNTRACKED"
+
 typedef enum {
     ERROR,
     WARNING,

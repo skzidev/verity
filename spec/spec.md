@@ -44,7 +44,24 @@ The standard libraary includes a bunch of types that are useful for modern devel
 
 ## Safety
 
-Memory safety is achieved through automatic reference counting, 
+Memory safety is achieved through automatic reference counting.
+
+## Expressions
+
+Expressions are evaluated with PEMDAS, meaning
+
+```
+(a - d) + b * c
+```
+
+becomes
+```
+     <add>
+      |   \
+  <sub>    <mul>
+  |  \      |  \
+  a   d     b   c
+```
 
 ## Notes
 

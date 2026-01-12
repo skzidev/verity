@@ -36,6 +36,9 @@ lint:
 	cppcheck $(SRC) $(TEST_SRCS)
 	clang-tidy $(SRC) $(TEST_SRCS) --fix-notes
 
+todo:
+	@python tests/tools/todos.py
+
 help:
 	@echo "Available Build Targets:"
 	@echo "\t- make / make all   Build the compiler"
@@ -43,3 +46,4 @@ help:
 	@echo "\t- make test         Run the testing suite"
 	@echo "\t- make clean        Remove build artifacts"
 	@echo "\t- make lint         Check the code for warnings/errors"
+	@echo "\t- make todo         Check the code for todo comments"
