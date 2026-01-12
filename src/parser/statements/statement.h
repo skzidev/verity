@@ -5,6 +5,7 @@
 #include "skip.h"
 #include "varasgn.h"
 #include "vardef.h"
+#include "return.h"
 
 typedef enum {
     RETURN,
@@ -22,6 +23,7 @@ typedef struct {
     StatementKind kind;
     union {
         BreakStatement breakStatement;
+        ReturnStatement returnStatement;
         SkipStatement skipStatement;
         VariableDefinitionStatement varDefineStatement;
         VariableAssignStatement varAssignStatement;

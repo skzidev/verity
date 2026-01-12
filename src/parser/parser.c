@@ -10,6 +10,10 @@ void parser_advance(){
     tok = parser.input.data[parser.pos * sizeof(Token)];
 }
 
+Token parser_peek(int lookahead){
+    return parser.input.data[(parser.pos + lookahead) * sizeof(Token)];
+}
+
 // TODO in Lexer, add TokenKind -> char* converter function
 
 void parser_expect(TokenKind s){

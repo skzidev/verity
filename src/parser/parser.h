@@ -14,6 +14,7 @@ extern Token tok;
 extern Parser parser;
 
 void parser_advance();
+Token parser_peek(int lookahead);
 void parser_expect(TokenKind s);
 
 void parser_Parse(TokenArray stream, char* fname);
