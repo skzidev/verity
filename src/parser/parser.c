@@ -53,6 +53,18 @@ bool parser_expect(TokenKind s){
 #pragma endregion
 #pragma region Grammar specific
 
+typedef struct {
+    char* type;
+    char* ident;
+    bool mutable;
+} Parameter;
+
+typedef struct {
+    Parameter* data;
+    int count;
+    int capacity;
+} ParameterList;
+
 void ParameterList_push(ParameterList* params, Parameter newItem){
     if(params->count == params->capacity){
         size_t newCapacity = params->capacity ? params->capacity * 2 : 16;
@@ -71,9 +83,9 @@ void ParameterList_push(ParameterList* params, Parameter newItem){
 }
 
 ParameterList parser_parameter_list(){
-    ParameterList stmt = {0};
+    ParameterList stmt = {};
 	while(tok.kind == (TOK_IDENT) || tok.kind == TOK_MUT){
-		Parameter param = {0};
+		Parameter param = {};
 		if(tok.kind == (TOK_MUT)){
 		    param.mutable = true;
 			parser_advance();
@@ -88,6 +100,10 @@ ParameterList parser_parameter_list(){
 	}
 	return stmt;
 }
+
+struct Block {
+    StatementList* statements;
+};
 
 Block* parser_block(){
     Block* block = malloc(sizeof(Block));
@@ -166,10 +182,35 @@ ProcedureDefinition* parser_procedure_definition(){
 	return stmt;
 }
 
+typedef enum {
+    EXTERNAL_PROC_DECLARATION,
+    EXTERNAL_VARIABLE_DECLARATION
+} ExternalDeclarationType;
+
+typedef struct {
+    char* ident;
+    ParameterList params;
+    char* retType;
+} ExternalProcedureDeclaration;
+
+typedef struct {
+    char* ident;
+    char* type;
+    Expression* rhs;
+    bool mutable;
+} ExternalVariableDeclaration;
+
+struct ExternalDeclaration {
+    ExternalDeclarationType type;
+    union {
+        ExternalProcedureDeclaration *procDecl;
+        ExternalVariableDeclaration *varDecl;
+    };
+};
+
 ExternalDeclaration* parser_external_declaration(){
     ExternalDeclaration* stmt = malloc(sizeof(ExternalDeclaration));
-	stmt->procDecl = malloc(sizeof(ProcedureDefinition));
-    // skip the "external" keyword
+	// skip the "external" keyword
 	parser_expect(TOK_EXTERNAL);
 	if(tok.kind == TOK_PROC){
 	    stmt->type = EXTERNAL_PROC_DECLARATION;

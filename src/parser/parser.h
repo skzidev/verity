@@ -1,4 +1,3 @@
-#pragma once
 #include "../diags/diagnostics.h"
 #include "../lexer/lexer.h"
 #include "./stmtParser/stmtParser.h"
@@ -25,11 +24,6 @@ extern void parser_dump_node(TopLevelStatement* s);
 typedef struct ProcedureDefinition ProcedureDefinition;
 typedef struct ExternalDeclaration ExternalDeclaration;
 typedef struct Block Block;
-
-
-struct Block {
-    StatementList* statements;
-};
 
 typedef struct {
     TopLevelStatementList* list;

@@ -66,13 +66,12 @@ int main(int argc, char *argv[]){
 
 	// Compile main file
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
-    if(opts.shouldMute)
+    if(!opts.shouldMute)
         THROW(NOTE, "UNTRACKED", "Lexical Analysis Complete");
     Program ast = parser_parse(&tokenStream, opts.inputFiles[0]);
     free(tokenStream.data);
-    if(opts.shouldMute)
+    if(!opts.shouldMute)
         THROW(NOTE, "UNTRACKED", "Parsing Complete");
-    semantics_analyze(ast);
 
     return 0;
 }
