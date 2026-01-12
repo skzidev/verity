@@ -1,6 +1,7 @@
 #include "../parser.h"
 #include "parameterlist.h"
 #include "identifierlist.h"
+#include "block.h"
 
 void ParameterList_push(ParameterList* list, Parameter item){
     if(list->capacity == list->count){
@@ -40,4 +41,12 @@ void IdentifierList_push(IdentifierList* list, char* item){
         list->data = (char**) realloc(list->data, sizeof(char*) * list->capacity);
     }
     list->data[list->count++] = item;
+}
+
+void block_append(Block *block, Statement stmt){
+    if(block->capacity == block->count){
+        block->capacity = block->capacity ? block->capacity * 2 : 16;
+        block->data = (Statement*) realloc(block->data, sizeof(Statement) * block->capacity);
+    }
+    block->data[block->count++] = stmt;
 }
