@@ -1,4 +1,5 @@
 #include "../parser.h"
+#include "condition.h"
 #include "add.h"
 #include "base.h"
 #include "mul.h"
@@ -97,4 +98,36 @@ PrimaryExpression parser_PrimaryExpression(){
     }
 
     return expr;
+}
+
+LogicalOperator LogOperator(){
+    if(tok.kind == TOK_EXCL && parser_peek(0).kind == TOK_ASSIGN){
+        return notEqualTo;
+    } else if(tok.kind == TOK_ASSIGN && parser_peek(0).kind == TOK_ASSIGN){
+        return equalTo;
+    } else if(tok.kind == TOK_LARR){
+        if(parser_peek(0).kind == TOK_ASSIGN)
+            return lessEqual;
+        return lessThan;
+    } else if(tok.kind == TOK_RARR){
+        if(parser_peek(0).kind == TOK_ASSIGN)
+            return greaterEqual;
+        return greaterThan;
+    } else THROW_FROM_USER_CODE(
+        ERROR,
+        filename,
+        tok.line,
+        tok.column,
+        "P0006",
+        "unknown logical operator '%c'",
+        tok.lexeme);
+    exit(1);
+}
+
+Condition parser_Condition(){
+    Condition cond = {0};
+    cond.lhs = parser_expression();
+    cond.op = LogOperator(tok);
+    cond.rhs = parser_expression();
+    return cond;
 }

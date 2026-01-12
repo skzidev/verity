@@ -1,6 +1,6 @@
-#include "parser.h"
-#include "../diags/diagnostics.h"
-#include "toplevel/toplevel.h"
+#include "../parser.h"
+#include "../../diags/diagnostics.h"
+#include "../toplevel/toplevel.h"
 
 Parser parser = {0};
 Token tok = {0};
@@ -33,11 +33,10 @@ void parser_expect(TokenKind s){
 
 void parser_Parse(TokenArray stream, char* fname){
     filename = fname;
+    parser.input = stream;
 
-    int i = 0;
-    while(stream.data[i * sizeof(Token)].kind != TOK_EOF){
+    while(tok.kind != TOK_EOF){
         // parse top level stmt
         parser_TopLevelStatement();
-        i ++;
     }
 }

@@ -8,3 +8,4 @@ typedef struct Block {
 } Block;
 
 void block_append(Block* block, Statement stmt);
+Block* parser_Block();

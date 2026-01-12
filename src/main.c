@@ -17,6 +17,7 @@ __     __        _ _
 
 #include "./config/config.h"
 #include "./globals.h"
+#include "parser/parser.h"
 
 #define BUILD_DATE __DATE__
 #define BUILD_TIME __TIME__
@@ -64,9 +65,16 @@ int main(int argc, char *argv[]){
     fcontent[size - 1] = '\0';
 
 	// Compile main file
+	if(opts.verbose)
+	    THROW(NOTE, no_code, "Starting Lexical Analysis");
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
-    if(opts.shouldMute)
-        THROW(NOTE, "UNTRACKED", "Lexical Analysis Complete");
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Lexical Analysis Complete");
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Starting Structural Analysis");
+    parser_Parse(tokenStream, opts.inputFiles[0]);
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Structural Analysis Complete");
 
     return 0;
 }

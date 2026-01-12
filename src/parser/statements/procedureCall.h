@@ -1,8 +1,9 @@
 #pragma once
+#include "../structures/expressionlist.h"
 
 typedef struct {
     char* ident;
-    // TODO implement ExpressionList
+    ExpressionList params;
 } ProcedureCall;
 
 ProcedureCall parser_ProcedureCall();

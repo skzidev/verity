@@ -6,7 +6,28 @@
 #include "return.h"
 #include "skip.h"
 #include "statement.h"
+#include "../structures/block.h"
 #include "vardef.h"
+
+ProcedureCall parser_ProcedureCall(){
+    ProcedureCall call = {0};
+    call.ident = tok.lexeme;
+    parser_expect(TOK_IDENT);
+    parser_expect(TOK_LPAREN);
+    call.params = parser_ExpressionList();
+    parser_expect(TOK_RPAREN);
+    return call;
+}
+
+IfStatement parser_IfStatement(){
+    IfStatement stmt = {0};
+    parser_expect(TOK_IF);
+    parser_expect(TOK_LPAREN);
+    stmt.condition = parser_Condition();
+    parser_expect(TOK_RPAREN);
+    stmt.block = parser_Block();
+    return stmt;
+}
 
 Statement parser_statement(){
     bool requiresSemicolon = true;
@@ -28,7 +49,7 @@ Statement parser_statement(){
         // TODO stmt.varDefineStatement = parser_VariableDefinitionStatement();
     } else if(tok.kind == TOK_IDENT && parser_peek(0).kind == TOK_LPAREN) {
         stmt.kind = PROCEDURE_CALL;
-        // TODO stmt.procCall = parser_ProcedureCall();
+        stmt.procCall = parser_ProcedureCall();
     } else {
         THROW_FROM_USER_CODE(ERROR,
             filename,
@@ -37,6 +58,7 @@ Statement parser_statement(){
             "P0003",
             "unknown statement kind");
     }
+    parser_expect(TOK_SEMI);
     return stmt;
 }
 
