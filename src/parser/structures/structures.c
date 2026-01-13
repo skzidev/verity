@@ -31,8 +31,9 @@ ParameterList parser_ParameterList(){
     ParameterList paramList = {0};
     while(tok.kind != TOK_RPAREN){
         ParameterList_push(&paramList, parser_Parameter());
-        if(tok.kind != TOK_RPAREN)
-            parser_expect(TOK_COMMA);
+        if(tok.kind == TOK_RPAREN)
+            break;
+        parser_expect(TOK_COMMA);
     }
     return paramList;
 }

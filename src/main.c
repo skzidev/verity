@@ -18,6 +18,7 @@ __     __        _ _
 #include "./config/config.h"
 #include "./globals.h"
 #include "./parser/parser.h"
+#include "parser/toplevel/toplevel.h"
 
 #define BUILD_DATE __DATE__
 #define BUILD_TIME __TIME__
@@ -82,6 +83,21 @@ int main(int argc, char *argv[]){
     Program ast = parser_Parse(tokenStream, opts.inputFiles[0]);
     if(opts.verbose)
         THROW(NOTE, no_code, "Structural Analysis Complete");
+
+    for(int i = 0; i < ast.count; i ++){
+        TopLevelStatement tp = ast.data[i * sizeof(TopLevelStatement)];
+        switch(tp.kind){
+            case IMPORT:
+                printf("\tIMPORT STMT: ");
+            break;
+            case PROCEDURE:
+                printf("\tPROC DEF: ");
+            break;
+            case EXTERNAL:
+                printf("\tEXTERNAL DECL: ");
+            break;
+        }
+    }
 
     return 0;
 }

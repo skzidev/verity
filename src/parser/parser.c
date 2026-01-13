@@ -8,7 +8,7 @@ Token tok = {0};
 char* filename;
 
 void parser_advance(){
-    tok = parser.input.data[parser.pos * sizeof(Token)];
+    tok = parser.input.data[parser.pos++ * sizeof(Token)];
 }
 
 Token parser_peek(int lookahead){
@@ -37,7 +37,8 @@ void Program_appendToplevel(Program *prog, TopLevelStatement stmt){
         prog->capacity = prog->capacity ? prog->capacity * 2 : 16;
         prog->data = (TopLevelStatement*) realloc(prog->data, sizeof(Expression) * prog->capacity);
     }
-    prog->data[prog->count++] = stmt;
+    prog->count ++;
+    prog->data[prog->count] = stmt;
 }
 
 Program parser_Parse(TokenArray stream, char* fname){
@@ -46,6 +47,7 @@ Program parser_Parse(TokenArray stream, char* fname){
 
     Program prog = {0};
 
+    parser_advance();
     while(tok.kind != TOK_EOF){
         // parse top level stmt
         Program_appendToplevel(&prog, parser_TopLevelStatement());

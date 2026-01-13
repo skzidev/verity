@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include "../structures/identifierlist.h"
 #include "../structures/parameterlist.h"
+#include "../structures/block.h"
 
 typedef struct {
     bool canRecurse;
@@ -10,6 +11,7 @@ typedef struct {
     ParameterList params;
     char* returnType;
     IdentifierList exceptions;
+    Block* block;
 } ProcedureDefinition;
 
 ProcedureDefinition parser_ProcedureDefinition();

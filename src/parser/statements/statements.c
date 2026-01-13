@@ -43,10 +43,10 @@ Statement parser_statement(){
         stmt.breakStatement = parser_BreakStatement();
     } else if(tok.kind == TOK_IF){
         stmt.kind = IF;
-        // TODO stmt.ifStmt = parser_IfStatement();
+        stmt.ifStmt = parser_IfStatement();
     } else if(tok.kind == TOK_MUT || (parser_peek(2).kind == TOK_ASSIGN)) {
         stmt.kind = VARIABLE_DEF;
-        // TODO stmt.varDefineStatement = parser_VariableDefinitionStatement();
+        //stmt.varDefineStatement = parser_VariableDefinitionStatement();
     } else if(tok.kind == TOK_IDENT && parser_peek(0).kind == TOK_LPAREN) {
         stmt.kind = PROCEDURE_CALL;
         stmt.procCall = parser_ProcedureCall();

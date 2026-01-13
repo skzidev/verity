@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 # Source - https://stackoverflow.com/a/287944
 # Posted by joeld, modified by community. See post 'Timeline' for change history
@@ -37,12 +38,17 @@ failed_unit_tests = []
 
 for test in unit_tests:
     print(f"\t- running test '{get_test_name(test)}'... ", end="")
+    start = time.time()
     output = subprocess.run(
         ["./bin/" + test.replace(".c", "")], capture_output=True, text=True, check=False
     )
+    end = time.time()
+    duration = (end - start) * 1000
     if output.returncode == 0:
         print(bcolors.OKGREEN + "PASS" + bcolors.ENDC)
-        passed_unit_tests.append(test)
+        passed_unit_tests.append(
+            {"name": get_test_name(test), "path": test, "duration": duration}
+        )
     else:
         print(bcolors.FAIL + "FAIL" + bcolors.ENDC)
         failed_unit_tests.append(test)
@@ -77,6 +83,28 @@ failed = len(failed_e2e_tests) + len(failed_unit_tests)
 print(
     f"{passed + failed} ran, {bcolors.OKGREEN}{passed}{bcolors.ENDC} passed, {bcolors.FAIL}{failed}{bcolors.ENDC} failed ({(passed / (passed + failed)) * 100}% passing rate)."
 )
+
+if not os.getenv("GITHUB_STEP_SUMMARY", "default") == "default":
+    print("Generating GH action output")
+    fname: str = os.getenv("GITHUB_STEP_SUMMARY", "")
+    f = open(fname, "w")
+    output = "## Unit test results\n\n"
+    output += f"**Job ID**: {os.getenv('GITHUB_JOB')}\n\n"
+    output += f"**Cause**: {os.getenv('GITHUB_REF_TYPE')}\n\n"
+    if failed > 0:
+        output += "Overall status: ❌ failed\n"
+    else:
+        output += "Overall status: ✅ passed\n"
+    output += "| Test | Status | Duration |\n"
+    output += "|------|--------|---------|\n"
+    for test in passed_unit_tests:
+        output += f"| {test['name']} | ✅ Passed | {round(test['duration'], 5)}ms |\n"
+    for test in failed_unit_tests:
+        output += f"| {test['name']} | ❌ failed | {round(test['duration'], 5)}ms |\n"
+    output += "\n\nFailure log:\n```"
+    output += failed_test_log if failed_test_log else "\nNo failure found\n"
+    output += "```"
+    f.write(output)
 
 if failed > 0:
     with open("./failed.log", "w") as f:

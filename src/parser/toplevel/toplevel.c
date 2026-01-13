@@ -23,17 +23,20 @@ ProcedureDefinition parser_ProcedureDefinition(){
     parser_expect(TOK_RETURNS);
     stmt.returnType = tok.lexeme;
     parser_expect(TOK_IDENT);
+    stmt.block = parser_Block();
     return stmt;
 }
 
 ImportStatement parser_ImportStatement(){
     ImportStatement stmt = {0};
     parser_expect(TOK_IMPORT);
+    printf("%s", parser_peek(1).lexeme);
     stmt.package = tok.lexeme;
     parser_expect(TOK_STRING);
     parser_expect(TOK_AS);
     stmt.ident = tok.lexeme;
     parser_expect(TOK_IDENT);
+    parser_expect(TOK_SEMI);
     return stmt;
 }
 
@@ -45,7 +48,6 @@ External_ProcedureDeclaration parser_ExternalProcdef(){
     parser_expect(TOK_LPAREN);
     // TODO parser_identifierList()
     parser_expect(TOK_RPAREN);
-    // TODO parser_block()
     return stmt;
 }
 
@@ -73,13 +75,14 @@ ExternalDeclaration parser_ExternalDeclaration(){
 
 TopLevelStatement parser_TopLevelStatement(){
     TopLevelStatement stmt = {0};
+    printf("%b", tok.kind == TOK_IMPORT);
     if(tok.kind == TOK_IMPORT){
         stmt.kind = IMPORT;
         stmt.impt = parser_ImportStatement();
     } else if(tok.kind == TOK_EXTERNAL){
         stmt.kind = EXTERNAL;
         stmt.extDecl = parser_ExternalDeclaration();
-    } else if(tok.kind == TOK_PROC){
+    } else if(tok.kind == TOK_PROC || tok.kind == TOK_RECURSIVE || tok.kind == TOK_PUBLIC){
         stmt.kind = PROCEDURE;
         stmt.procDef = parser_ProcedureDefinition();
     } else {
@@ -93,6 +96,7 @@ TopLevelStatement parser_TopLevelStatement(){
             tok.lexeme,
             tok.kind
         );
+        exit(1);
     }
     return stmt;
 }
