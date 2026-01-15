@@ -4,6 +4,7 @@
 #include "import.h"
 #include "procedures.h"
 #include "../../diags/diagnostics.h"
+#include <string.h>
 
 ProcedureDefinition parser_ProcedureDefinition(){
     ProcedureDefinition stmt = {0};
@@ -20,9 +21,14 @@ ProcedureDefinition parser_ProcedureDefinition(){
     parser_expect(TOK_IDENT);
     parser_expect(TOK_LPAREN);
     stmt.params = parser_ParameterList();
+    parser_expect(TOK_RPAREN);
     parser_expect(TOK_RETURNS);
     stmt.returnType = tok.lexeme;
     parser_expect(TOK_IDENT);
+    if(tok.kind == TOK_THROWS){
+        parser_expect(TOK_THROWS);
+        stmt.exceptions = parser_IdentifierList();
+    }
     stmt.block = parser_Block();
     return stmt;
 }
@@ -81,7 +87,6 @@ ExternalDeclaration parser_ExternalDeclaration(){
 
 TopLevelStatement parser_TopLevelStatement(){
     TopLevelStatement stmt = {0};
-    printf("tok kind: %d\n", tok.kind);
     if(tok.kind == TOK_IMPORT){
         stmt.kind = IMPORT;
         stmt.impt = parser_ImportStatement();

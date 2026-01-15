@@ -1,4 +1,5 @@
 #include "../parser.h"
+#include <string.h>
 #include "condition.h"
 #include "add.h"
 #include "base.h"
@@ -68,21 +69,40 @@ PrimaryExpression parser_PrimaryExpression(){
     switch(tok.kind){
         case TOK_INT:
             expr.kind = INTEGER_LITERAL;
+            expr.IntegerLiteral = atoi(tok.lexeme);
+            parser_expect(TOK_INT);
             break;
         case TOK_FLOAT:
             expr.kind = FLOAT_LITERAL;
+            expr.FloatLiteral = atof(tok.lexeme);
+            parser_expect(TOK_FLOAT);
             break;
         case TOK_STRING:
             expr.kind = STRING_LITERAL;
+            expr.StringLiteral = tok.lexeme;
+            parser_expect(TOK_STRING);
             break;
         case TOK_IDENT:
+            if(parser_peek(0).kind == TOK_LPAREN){
+                expr.kind = PROCEDURE_CALL_RETURN;
+                // TODO this is stack allocated so it may be inaccessible later
+                // may cause a dangling pointer
+                ProcedureCall call = parser_ProcedureCall();
+                expr.call = &call;
+                break;
+            }
             expr.kind = VARIABLE;
+            expr.VariableName = tok.lexeme;
+            parser_expect(TOK_IDENT);
             break;
         case TOK_BOOL:
             expr.kind = BOOLEAN_LITERAL;
+            expr.BooleanLiteral = strcmp("true", tok.lexeme) ? true : false;
+            parser_expect(TOK_BOOL);
             break;
         case TOK_NULL:
             expr.kind = NULL_LITERAL;
+            parser_expect(TOK_NULL);
             break;
         default:
             THROW_FROM_USER_CODE(

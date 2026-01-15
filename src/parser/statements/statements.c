@@ -7,6 +7,7 @@
 #include "skip.h"
 #include "statement.h"
 #include "../structures/block.h"
+#include "varasgn.h"
 #include "vardef.h"
 
 VariableDefinitionStatement parser_VariableDefinitionStatement(){
@@ -17,6 +18,15 @@ VariableDefinitionStatement parser_VariableDefinitionStatement(){
     }
     stmt.type = tok.lexeme;
     parser_expect(TOK_IDENT);
+    stmt.ident = tok.lexeme;
+    parser_expect(TOK_IDENT);
+    parser_expect(TOK_ASSIGN);
+    stmt.value = parser_expression();
+    return stmt;
+}
+
+VariableAssignStatement parser_VariableAssignStatement(){
+    VariableAssignStatement stmt = {0};
     stmt.ident = tok.lexeme;
     parser_expect(TOK_IDENT);
     parser_expect(TOK_ASSIGN);
@@ -59,9 +69,12 @@ Statement parser_statement(){
     } else if(tok.kind == TOK_IF){
         stmt.kind = IF;
         stmt.ifStmt = parser_IfStatement();
-    } else if(tok.kind == TOK_MUT || (parser_peek(2).kind == TOK_ASSIGN)) {
+    } else if(tok.kind == TOK_MUT || (parser_peek(1).kind == TOK_ASSIGN)) {
         stmt.kind = VARIABLE_DEF;
         stmt.varDefineStatement = parser_VariableDefinitionStatement();
+    } else if(tok.kind == TOK_IDENT && parser_peek(0).kind == TOK_ASSIGN) {
+        stmt.kind = VARIABLE_ASGN;
+        stmt.varAssignStatement = parser_VariableAssignStatement();
     } else if(tok.kind == TOK_IDENT && parser_peek(0).kind == TOK_LPAREN) {
         stmt.kind = PROCEDURE_CALL;
         stmt.procCall = parser_ProcedureCall();
@@ -91,7 +104,7 @@ BreakStatement parser_BreakStatement(){
 
 ReturnStatement parser_ReturnStatement(){
     ReturnStatement stmt = {0};
-    parser_expect(TOK_RETURNS);
+    parser_expect(TOK_RETURN);
     stmt.value = parser_expression();
     return stmt;
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "../structures/expressionlist.h"
 
-typedef struct {
+typedef struct ProcedureCall {
     char* ident;
     ExpressionList params;
 } ProcedureCall;

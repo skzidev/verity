@@ -1,4 +1,4 @@
-external proc malloc(int size) returns int;
+external proc malloc(int) returns int;
 external int x;
 
 proc add(int a, int b) returns int {

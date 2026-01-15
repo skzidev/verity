@@ -8,16 +8,23 @@ Token tok = {0};
 char* filename;
 
 void parser_advance(){
-    tok = parser.input.data[parser.pos++ * sizeof(Token)];
+    tok = parser.input.data[parser.pos++];
 }
 
 Token parser_peek(int lookahead){
-    return parser.input.data[(parser.pos + lookahead) * sizeof(Token)];
+    return parser.input.data[(parser.pos + lookahead)];
 }
 
 // TODO in Lexer, add TokenKind -> char* converter function
 
 void parser_expect(TokenKind s){
+    fprintf(stderr,
+        "EXPECT %d, GOT %d, LEXEME='%s'\n",
+        s,
+        tok.kind,
+        tok.lexeme ? tok.lexeme : "<null>"
+    );
+    fprintf(stderr, "lexeme ptr = %p\n", (void*)tok.lexeme);
     if(tok.kind == s){
         parser_advance();
         return;
@@ -39,10 +46,9 @@ void parser_expect(TokenKind s){
 void Program_appendToplevel(Program *prog, TopLevelStatement stmt){
     if(prog->capacity == prog->count){
         prog->capacity = prog->capacity ? prog->capacity * 2 : 16;
-        prog->data = (TopLevelStatement*) realloc(prog->data, sizeof(Expression) * prog->capacity);
+        prog->data = (TopLevelStatement*) realloc(prog->data, sizeof(TopLevelStatement) * prog->capacity);
     }
-    prog->count ++;
-    prog->data[prog->count] = stmt;
+    prog->data[prog->count++] = stmt;
 }
 
 Program parser_Parse(TokenArray stream, char* fname){

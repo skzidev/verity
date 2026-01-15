@@ -41,10 +41,10 @@ ParameterList parser_ParameterList(){
 
 IdentifierList parser_IdentifierList(){
     IdentifierList l = {0};
-    while(tok.kind != TOK_RPAREN){
+    while(tok.kind == TOK_IDENT){
         IdentifierList_push(&l, tok.lexeme);
         parser_expect(TOK_IDENT);
-        if(tok.kind == TOK_RPAREN)
+        if(tok.kind != TOK_COMMA)
             break;
         parser_expect(TOK_COMMA);
     }
@@ -98,7 +98,8 @@ ExpressionList parser_ExpressionList(){
 }
 
 Block* parser_Block(){
-    Block* block = malloc(sizeof(Block));
+    Block* block = calloc(1, sizeof(Block));
+
     parser_expect(TOK_LBRACE);
     while(tok.kind != TOK_RBRACE){
         block_append(block, parser_statement());
