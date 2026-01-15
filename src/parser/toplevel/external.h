@@ -1,5 +1,5 @@
 #pragma once
-#include "../structures/parameterlist.h"
+#include "../structures/identifierlist.h"
 
 typedef struct {
     char* ident;
@@ -8,7 +8,7 @@ typedef struct {
 
 typedef struct {
     char* ident;
-    ParameterList params;
+    IdentifierList params;
     char* returnType;
 } External_ProcedureDeclaration;
 

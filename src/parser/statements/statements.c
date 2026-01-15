@@ -9,6 +9,21 @@
 #include "../structures/block.h"
 #include "vardef.h"
 
+VariableDefinitionStatement parser_VariableDefinitionStatement(){
+    VariableDefinitionStatement stmt = {0};
+    if(tok.kind == TOK_MUT){
+        stmt.isMutable = true;
+        parser_expect(TOK_MUT);
+    }
+    stmt.type = tok.lexeme;
+    parser_expect(TOK_IDENT);
+    stmt.ident = tok.lexeme;
+    parser_expect(TOK_IDENT);
+    parser_expect(TOK_ASSIGN);
+    stmt.value = parser_expression();
+    return stmt;
+}
+
 ProcedureCall parser_ProcedureCall(){
     ProcedureCall call = {0};
     call.ident = tok.lexeme;
@@ -46,7 +61,7 @@ Statement parser_statement(){
         stmt.ifStmt = parser_IfStatement();
     } else if(tok.kind == TOK_MUT || (parser_peek(2).kind == TOK_ASSIGN)) {
         stmt.kind = VARIABLE_DEF;
-        //stmt.varDefineStatement = parser_VariableDefinitionStatement();
+        stmt.varDefineStatement = parser_VariableDefinitionStatement();
     } else if(tok.kind == TOK_IDENT && parser_peek(0).kind == TOK_LPAREN) {
         stmt.kind = PROCEDURE_CALL;
         stmt.procCall = parser_ProcedureCall();

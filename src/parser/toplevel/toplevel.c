@@ -30,7 +30,6 @@ ProcedureDefinition parser_ProcedureDefinition(){
 ImportStatement parser_ImportStatement(){
     ImportStatement stmt = {0};
     parser_expect(TOK_IMPORT);
-    printf("%s", parser_peek(1).lexeme);
     stmt.package = tok.lexeme;
     parser_expect(TOK_STRING);
     parser_expect(TOK_AS);
@@ -46,8 +45,13 @@ External_ProcedureDeclaration parser_ExternalProcdef(){
     stmt.ident = tok.lexeme;
     parser_expect(TOK_IDENT);
     parser_expect(TOK_LPAREN);
-    // TODO parser_identifierList()
+    stmt.params = parser_IdentifierList();
     parser_expect(TOK_RPAREN);
+    parser_expect(TOK_RETURNS);
+    stmt.returnType = tok.lexeme;
+    parser_expect(TOK_IDENT);
+    parser_expect(TOK_SEMI);
+    THROW(NOTE, no_code, "found decl for external proc '%s' which returns '%s'", stmt.ident, stmt.returnType);
     return stmt;
 }
 
@@ -57,6 +61,8 @@ External_VariableDeclaration parser_ExternalVariableDecl(){
     parser_expect(TOK_IDENT);
     decl.ident = tok.lexeme;
     parser_expect(TOK_IDENT);
+    parser_expect(TOK_SEMI);
+    THROW(NOTE, no_code, "found decl for external var '%s' of type '%s'", decl.ident, decl.type);
     return decl;
 }
 
@@ -75,7 +81,7 @@ ExternalDeclaration parser_ExternalDeclaration(){
 
 TopLevelStatement parser_TopLevelStatement(){
     TopLevelStatement stmt = {0};
-    printf("%b", tok.kind == TOK_IMPORT);
+    printf("tok kind: %d\n", tok.kind);
     if(tok.kind == TOK_IMPORT){
         stmt.kind = IMPORT;
         stmt.impt = parser_ImportStatement();

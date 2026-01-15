@@ -18,18 +18,22 @@ Token parser_peek(int lookahead){
 // TODO in Lexer, add TokenKind -> char* converter function
 
 void parser_expect(TokenKind s){
-    if(tok.kind == s) parser_advance();
-    else THROW_FROM_USER_CODE(
+    if(tok.kind == s){
+        parser_advance();
+        return;
+    }
+    THROW_FROM_USER_CODE(
         ERROR,
         filename,
         tok.line,
         tok.column,
         "P0001",
-        "unexpected token '%s' (kind '%d', expected '%d')",
+        "unexpected token '%s' (kind '%d', expected kind '%d')",
         tok.lexeme,
         tok.kind,
         s
     );
+    exit(1);
 }
 
 void Program_appendToplevel(Program *prog, TopLevelStatement stmt){

@@ -7,3 +7,4 @@ typedef struct {
 } IdentifierList;
 
 void IdentifierList_push(IdentifierList* list, char* item);
+IdentifierList parser_IdentifierList();

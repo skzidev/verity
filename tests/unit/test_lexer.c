@@ -16,7 +16,7 @@ void test_lexer(char* src, TokenKind expected[], int len){
 
 	TokenArray tarr = lexer_tokenize(src, "src.vty");
 
-	printf("asserting '%d' == '%ld'\n", len, tarr.count);
+	printf("asserting len: '%d' == '%ld'\n", len, tarr.count);
 	assert(tarr.count == (size_t)len && "returned count != expected count");
 
 	for(size_t i = 0; i < tarr.count; i ++){
@@ -35,9 +35,13 @@ int main(){
 	TokenKind set2[] = { TOK_IMPORT, TOK_STRING, TOK_AS, TOK_IDENT, TOK_SEMI, TOK_EOF };
 	char* source2 = "import \"std/fs\" as fs;";
 
+	TokenKind set3[] = { TOK_EXTERNAL, TOK_IDENT, TOK_IDENT, TOK_SEMI, TOK_EOF };
+	char* source3 = "external int x;";
+
 	// Run the test here
 	RUN_TEST(source1, set1);
 	RUN_TEST(source2, set2);
+	RUN_TEST(source3, set3);
 	printf("[PASS]: Test 'lexer' Passed\n");
 	return 0;
 }

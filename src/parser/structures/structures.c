@@ -4,6 +4,7 @@
 #include "parameterlist.h"
 #include "identifierlist.h"
 #include "block.h"
+#include <complex.h>
 
 void ParameterList_push(ParameterList* list, Parameter item){
     if(list->capacity == list->count){
@@ -36,6 +37,18 @@ ParameterList parser_ParameterList(){
         parser_expect(TOK_COMMA);
     }
     return paramList;
+}
+
+IdentifierList parser_IdentifierList(){
+    IdentifierList l = {0};
+    while(tok.kind != TOK_RPAREN){
+        IdentifierList_push(&l, tok.lexeme);
+        parser_expect(TOK_IDENT);
+        if(tok.kind == TOK_RPAREN)
+            break;
+        parser_expect(TOK_COMMA);
+    }
+    return l;
 }
 
 void IdentifierList_push(IdentifierList* list, char* item){
