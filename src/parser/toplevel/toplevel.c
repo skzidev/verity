@@ -57,7 +57,6 @@ External_ProcedureDeclaration parser_ExternalProcdef(){
     stmt.returnType = tok.lexeme;
     parser_expect(TOK_IDENT);
     parser_expect(TOK_SEMI);
-    THROW(NOTE, no_code, "found decl for external proc '%s' which returns '%s'", stmt.ident, stmt.returnType);
     return stmt;
 }
 
@@ -68,7 +67,6 @@ External_VariableDeclaration parser_ExternalVariableDecl(){
     decl.ident = tok.lexeme;
     parser_expect(TOK_IDENT);
     parser_expect(TOK_SEMI);
-    THROW(NOTE, no_code, "found decl for external var '%s' of type '%s'", decl.ident, decl.type);
     return decl;
 }
 

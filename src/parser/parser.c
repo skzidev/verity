@@ -18,13 +18,6 @@ Token parser_peek(int lookahead){
 // TODO in Lexer, add TokenKind -> char* converter function
 
 void parser_expect(TokenKind s){
-    fprintf(stderr,
-        "EXPECT %d, GOT %d, LEXEME='%s'\n",
-        s,
-        tok.kind,
-        tok.lexeme ? tok.lexeme : "<null>"
-    );
-    fprintf(stderr, "lexeme ptr = %p\n", (void*)tok.lexeme);
     if(tok.kind == s){
         parser_advance();
         return;
