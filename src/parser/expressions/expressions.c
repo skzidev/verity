@@ -22,6 +22,7 @@ AddExpression parser_AddExpression(){
     AddExpression expr = {0};
     expr.lhs = parser_MulExpression();
     if(tok.kind == TOK_PLUS || tok.kind == TOK_MINUS){
+        expr.hasRhs = true;
         if(tok.kind == TOK_PLUS){
             expr.op = ADD;
             parser_expect(TOK_PLUS);
@@ -38,6 +39,7 @@ MulExpression parser_MulExpression(){
     MulExpression expr = {0};
     expr.lhs = parser_UnaryExpression();
     if(tok.kind == TOK_STAR || tok.kind == TOK_SLASH){
+        expr.hasRhs = true;
         if(tok.kind == TOK_STAR){
             expr.op = MUL;
             parser_expect(TOK_STAR);

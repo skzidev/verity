@@ -4,7 +4,7 @@
 typedef enum {
     NOT,
     NEGATIVE
-    // TODO potentially ADDROF and DEREFERENCE
+    // TODO pointer operators like referenceto and dereference
 } UnaryOperator;
 typedef struct {
     PrimaryExpression lhs;

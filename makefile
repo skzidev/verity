@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -std=c11 -g
 
-RUNFLAGS := -b examples/main.vty
+RUNFLAGS := -b examples/main.vty --log-tokens
 
 SRC := $(shell find src -name '*.c')
 

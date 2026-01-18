@@ -11,6 +11,7 @@ typedef struct {
     MulExpression lhs;
     MulExpression rhs;
     AddOperator op;
+    bool hasRhs;
 } AddExpression;
 
 AddExpression parser_AddExpression();

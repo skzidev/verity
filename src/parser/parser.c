@@ -7,16 +7,25 @@ Parser parser = {0};
 Token tok = {0};
 char* filename;
 
+/**
+ * Move the parser's token forward
+ */
 void parser_advance(){
     tok = parser.input.data[parser.pos++];
 }
 
+/**
+ * Look at the parser's next nth token
+ */
 Token parser_peek(int lookahead){
     return parser.input.data[(parser.pos + lookahead)];
 }
 
 // TODO in Lexer, add TokenKind -> char* converter function
 
+/**
+ * Expect a token kind, otherwise fail
+ */
 void parser_expect(TokenKind s){
     if(tok.kind == s){
         parser_advance();
@@ -44,6 +53,9 @@ void Program_appendToplevel(Program *prog, TopLevelStatement stmt){
     prog->data[prog->count++] = stmt;
 }
 
+/**
+ * Run the parser to convert a token stream -> ast
+ */
 Program parser_Parse(TokenArray stream, char* fname){
     filename = fname;
     parser.input = stream;

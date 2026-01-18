@@ -73,7 +73,7 @@ The Verity language uses a CalVer system, however: `{YEAR}.{COUNTER}`, where `{Y
 
 - [x] Lexer
 
-- [ ] Parser
+- [x] Parser
 
 - [ ] Semantic Analyzer
 

@@ -1,3 +1,5 @@
+import "std/fs" as fs;
+
 external proc malloc(int) returns int;
 external int x;
 
@@ -12,8 +14,8 @@ proc readFile(string path) returns string throws FileNotFoundError {
 proc main() returns int {
     int x = 5;
     mut int y = 10;
-    y = y / x;
 
     print(add(x, y));
     print(readFile("./config.txt"));
+    return 0;
 }

@@ -18,9 +18,7 @@ __     __        _ _
 #include "./config/config.h"
 #include "./globals.h"
 #include "./parser/parser.h"
-#include "parser/statements/statement.h"
-#include "parser/toplevel/external.h"
-#include "parser/toplevel/toplevel.h"
+#include "semantic/semantic.h"
 
 #define BUILD_DATE __DATE__
 #define BUILD_TIME __TIME__
@@ -86,48 +84,11 @@ int main(int argc, char *argv[]){
     if(opts.verbose)
         THROW(NOTE, no_code, "Structural Analysis Complete");
 
-    for(int i = 0; i < ast.count; i ++){
-        TopLevelStatement tp = ast.data[i];
-        switch(tp.kind){
-            case IMPORT:
-                printf("\tIMPORT STMT: \n");
-            break;
-            case PROCEDURE:
-                printf("\tPROC DEF: %s \n", tp.procDef.ident);
-                for(int i = 0; i < tp.procDef.block->count; i ++){
-                    printf("\t\tSTATEMENT: %d\n", tp.procDef.block->data[i].kind);
-                    switch(tp.procDef.block->data[i].kind){
-                        case RETURN:
-                            printf("\t\t\tRETURN\n");
-                            break;
-                        case PROCEDURE_CALL:
-                            printf("\t\t\tPROC CALL: %s\n", tp.procDef.block->data[i].procCall.ident);
-                            break;
-                        case SKIP:
-                            printf("\t\t\tSKIP:\n");
-                            break;
-                        case VARIABLE_ASGN:
-                            printf("\t\t\tVARIABLE ASSIGN: %s\n", tp.procDef.block->data[i].varAssignStatement.ident);
-                            break;
-                        case VARIABLE_DEF:
-                            printf("\t\t\tVARIABLE DEF: %s\n", tp.procDef.block->data[i].varDefineStatement.ident);
-                            break;
-                        case BREAK:
-                            printf("\t\t\tBREAK:\n");
-                            break;
-                        case IF:
-                        case ELSEIF:
-                        case ELSE:
-                            printf("\t\t\tCONDITIONAL\n");
-                            break;
-                    }
-                }
-            break;
-            case EXTERNAL:
-                printf("\tEXTERNAL DECL: %s \n", tp.extDecl.kind == EXTERNAL_PROCDECL ? tp.extDecl.procDecl.ident : tp.extDecl.varDecl.ident);
-            break;
-        }
-    }
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Starting Semantic Analysis");
+    semantics_enrich(ast);
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Semantic analysis complete");
 
     return 0;
 }
