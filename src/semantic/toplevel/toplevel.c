@@ -33,7 +33,7 @@ PrimaryExpression semantics_PrimaryExpression(PrimaryExpression expr){
             printf("\t\t\t\tNULL\n");
             break;
         case PROCEDURE_CALL_RETURN:
-            printf("\t\t\t\tPROC CALL: \"%s\"\n", expr.call->ident);
+            printf("\t\t\t\tPROC CALL: to \"%s\" with %d parameters \n", expr.call->ident, expr.call->params.count);
             break;
         case SUBEXPRESSION:
             printf("\t\t\t\tSUBEXPR: \n");
