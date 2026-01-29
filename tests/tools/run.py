@@ -42,7 +42,7 @@ for module in covered:
         file.stat().st_size for file in pathlib.Path("./src/" + module).rglob("*")
     )
 code_coverage = (coveredSize / totalSize) * 100
-print(f"{round(code_coverage, 5)}% code coverage (approx.)")
+print(f"{round(code_coverage, 5)}% size-based code coverage (approx.)")
 failed_test_log = ""
 
 
@@ -114,13 +114,13 @@ if not os.getenv("GITHUB_STEP_SUMMARY", "default") == "default":
     print("Generating GH action output")
     fname: str = os.getenv("GITHUB_STEP_SUMMARY", "")
     f = open(fname, "w")
-    output = "## Unit test results\n\n"
+    output = "## Testing Results\n\n"
     output += f"**Job ID**: {os.getenv('GITHUB_JOB')}\n\n"
     output += f"**Cause**: {os.getenv('GITHUB_REF_TYPE')}\n\n"
-    output += f"**Test time**: {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime(time.time()))}\n\n"
-    output += f"**Code Coverage (approx.)**: ~{round(code_coverage, 2)}%\n\n"
+    output += f"**Test timestamp**: {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime(time.time()))}\n\n"
+    output += f"**Size-based Code Coverage**: ~{round(code_coverage, 2)}%\n\n"
     for module in [m for m in modules if m not in covered]:
-        output += f"\t- Module **'{module}'** has no unit test\n\n"
+        output += f" - Module **'{module}'** has no unit test\n\n"
     if failed > 0:
         output += "**Overall status**: ❌ failed\n"
     else:

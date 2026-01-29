@@ -21,6 +21,7 @@ typedef enum {
 
 typedef struct {
     StatementKind kind;
+    int line;
     union {
         BreakStatement breakStatement;
         ReturnStatement returnStatement;

@@ -1,16 +1,9 @@
 #include "toplevel.h"
+#include "../../diags/diagnostics.h"
 #include <stdio.h>
+#include "../symbols/symbols.h"
 
-typedef enum {
-    PROCEDURE_SYMBOL,
-    VARIABLE_SYMBOL
-} SymbolKind;
-
-typedef struct {
-    int definitionLine;
-    char* name;
-    SymbolKind k;
-} Symbol;
+ScopeStack stack = {0};
 
 PrimaryExpression semantics_PrimaryExpression(PrimaryExpression expr){
     switch(expr.kind){
@@ -24,6 +17,15 @@ PrimaryExpression semantics_PrimaryExpression(PrimaryExpression expr){
             printf("\t\t\t\tFLOAT LITERAL: \"%f\"\n", expr.FloatLiteral);
             break;
         case VARIABLE:
+            Symbol* sym = lookup_symbol(&stack, expr.VariableName);
+            if(sym == NULL){
+                // TODO this 0,0 thing will be confusing. fix.
+                // we have to embed document positional data inside the AST structures
+                // right now it isn't accessible to us here
+                THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0001", "use of undefined variable '%s'");
+                exit(1);
+            }
+            // TODO context lookup to find required type
             printf("\t\t\t\tVARIABLE: \"%s\"\n", expr.VariableName);
             break;
         case BOOLEAN_LITERAL:
@@ -87,7 +89,9 @@ ProcedureCall semantics_ProcCall(ProcedureCall stmt){
 }
 
 ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
+    ScopeStack_push(&stack);
     for(int i = 0; i < tp.block->count; i ++){
+        Statement stmt = tp.block->data[i];
         switch(tp.block->data[i].kind){
             case RETURN:
                 printf("\t\tRETURN\n");
@@ -102,9 +106,20 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
             break;
             case VARIABLE_ASGN:
                 printf("\t\tVARIABLE ASSIGN: %s\n", tp.block->data[i].varAssignStatement.ident);
+                Symbol* assignedToSym = lookup_symbol(&stack, stmt.varAssignStatement.ident);
+                if(assignedToSym == NULL)
+                    THROW_FROM_USER_CODE(ERROR, filename, stmt.line, 0, "S0002", "cannot assign to undeclared variable '%s'", stmt.varAssignStatement.ident);
             break;
             case VARIABLE_DEF:
                 printf("\t\tVARIABLE DEF: %s\n", tp.block->data[i].varDefineStatement.ident);
+                // Insert this variable into the scope
+                Symbol newSym = {0};
+                newSym.ident = tp.block->data[i].varDefineStatement.ident;
+                newSym.kind = VariableSymbol;
+                newSym.next = NULL;
+                newSym.definedLine = tp.block->data[i].line;
+                newSym.type = tp.block->data[i].varDefineStatement.type;
+                ScopeStack_InsertSymbolAtLatestScope(&stack, newSym);
                 semantics_Expression(tp.block->data[i].varDefineStatement.value);
             break;
             case BREAK:
@@ -117,5 +132,6 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
             break;
         }
     }
+    ScopeStack_pop(&stack);
     return tp;
 }

@@ -1,23 +1,46 @@
 #pragma once
 
-typedef struct Scope {};
-
-typedef struct ScopeStack {
-    int count;
-    Scope* data;
-};
-
-void ScopeStack_push(){}
-
-void ScopeStack_pop(){}
-
 typedef enum {
     VariableSymbol,
     ProcedureSymbol,
     ExternalSymbol
 } SymbolKind;
 
-typedef struct {
+typedef struct Symbol {
     SymbolKind kind;
     char* ident;
+    char* type;
+    struct Symbol* next;
+    int definedLine;
 } Symbol;
+
+typedef struct Scope {
+    Symbol* symbolTable;
+    struct Scope* parent;
+} Scope;
+
+/**
+ * Insert a symbol into a scope
+ */
+void Scope_insertSymbol(Scope *scope, Symbol sym);
+
+typedef struct ScopeStack {
+    Scope* top;
+} ScopeStack;
+
+/**
+ * Add a new scope onto a ScopeStack
+ */
+void ScopeStack_push(ScopeStack *stack);
+
+/**
+ * Remove the last scope from a ScopeStack
+ */
+void ScopeStack_pop(ScopeStack* stack);
+
+/**
+ * Insert a symbol on the top stack
+ */
+void ScopeStack_InsertSymbolAtLatestScope(ScopeStack *stack, Symbol sym);
+
+Symbol* lookup_symbol(ScopeStack* stack, const char *name);

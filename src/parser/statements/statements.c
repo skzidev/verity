@@ -57,6 +57,7 @@ IfStatement parser_IfStatement(){
 Statement parser_statement(){
     bool requiresSemicolon = true;
     Statement stmt = {0};
+    stmt.line = tok.line;
     if(tok.kind == TOK_RETURN){
         stmt.kind = RETURN;
         stmt.returnStatement = parser_ReturnStatement();
