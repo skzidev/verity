@@ -33,7 +33,7 @@ PrimaryExpression semantics_PrimaryExpression(PrimaryExpression expr){
             printf("\t\t\t\tNULL\n");
             break;
         case PROCEDURE_CALL_RETURN:
-            printf("\t\t\t\tPROC CALL: to \"%s\" with %d parameters \n", expr.call->ident, expr.call->params.count);
+            printf("\t\t\t\tPROC CALL: to \"%s\" with %d parameter(s) \n", expr.call->ident, expr.call->params.count);
             break;
         case SUBEXPRESSION:
             printf("\t\t\t\tSUBEXPR: \n");
@@ -59,6 +59,10 @@ MulExpression semantics_MulExpression(MulExpression expr){
 
 AddExpression semantics_AddExpression(AddExpression expr){
     semantics_MulExpression(expr.lhs);
+    if(expr.hasRhs && expr.op == ADD)
+        printf("\t\t\t\tOPERATOR: +\n");
+    else if(expr.op == SUB)
+        printf("\t\t\t\tOPERATOR: -\n");
     if(expr.hasRhs)
         semantics_MulExpression(expr.rhs);
     return expr;

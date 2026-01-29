@@ -43,7 +43,9 @@ for file in files:
 i = 0
 for todo in todos:
     print(
-        todo["text"]
+        todo["text"].replace(
+            "TODO", bcolors.OKBLUE + bcolors.BOLD + "TODO:" + bcolors.ENDC
+        )
         + bcolors.BOLD
         + f" ({todo['file']}:{todo['number']})"
         + bcolors.ENDC

@@ -1,10 +1,7 @@
 import os
+import pathlib
 import subprocess
 import time
-
-# Source - https://stackoverflow.com/a/287944
-# Posted by joeld, modified by community. See post 'Timeline' for change history
-# Retrieved 2025-12-25, License - CC BY-SA 4.0
 
 
 class bcolors:
@@ -19,6 +16,33 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
+# Source - https://stackoverflow.com/a/287944
+# Posted by joeld, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-12-25, License - CC BY-SA 4.0
+
+
+def contains(str, letter):
+    try:
+        return str.index(letter)
+    except ValueError:
+        return -1
+
+
+print("pre-calculating stats...")
+modules = [x for x in os.listdir("./src") if not contains(x, ".") != -1]
+covered = [x for x in modules if os.path.exists("./tests/unit/test_" + x + ".c")]
+totalSize = 0
+for module in modules:
+    totalSize += sum(
+        file.stat().st_size for file in pathlib.Path("./src/" + module).rglob("*")
+    )
+coveredSize = 0
+for module in covered:
+    coveredSize += sum(
+        file.stat().st_size for file in pathlib.Path("./src/" + module).rglob("*")
+    )
+code_coverage = (coveredSize / totalSize) * 100
+print(f"{round(code_coverage, 5)}% code coverage (approx.)")
 failed_test_log = ""
 
 
@@ -84,6 +108,8 @@ print(
     f"{passed + failed} ran, {bcolors.OKGREEN}{passed}{bcolors.ENDC} passed, {bcolors.FAIL}{failed}{bcolors.ENDC} failed ({(passed / (passed + failed)) * 100}% passing rate)."
 )
 
+import time
+
 if not os.getenv("GITHUB_STEP_SUMMARY", "default") == "default":
     print("Generating GH action output")
     fname: str = os.getenv("GITHUB_STEP_SUMMARY", "")
@@ -91,12 +117,16 @@ if not os.getenv("GITHUB_STEP_SUMMARY", "default") == "default":
     output = "## Unit test results\n\n"
     output += f"**Job ID**: {os.getenv('GITHUB_JOB')}\n\n"
     output += f"**Cause**: {os.getenv('GITHUB_REF_TYPE')}\n\n"
+    output += f"**Test time**: {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime(time.time()))}\n\n"
+    output += f"**Code Coverage (approx.)**: ~{round(code_coverage, 2)}%\n\n"
+    for module in [m for m in modules if m not in covered]:
+        output += f"\t- Module **'{module}'** has no unit test\n\n"
     if failed > 0:
-        output += "Overall status: ❌ failed\n"
+        output += "**Overall status**: ❌ failed\n"
     else:
-        output += "Overall status: ✅ passed\n"
+        output += "**Overall status**: ✅ passed\n"
     output += "| Test | Status | Duration |\n"
-    output += "|------|--------|---------|\n"
+    output += "|------|--------|----------|\n"
     for test in passed_unit_tests:
         output += f"| {test['name']} | ✅ Passed | {round(test['duration'], 5)}ms |\n"
     for test in failed_unit_tests:
