@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 typedef enum {
     VariableSymbol,
@@ -12,6 +13,7 @@ typedef struct Symbol {
     char* type;
     struct Symbol* next;
     int definedLine;
+    bool isMutable;
 } Symbol;
 
 typedef struct Scope {

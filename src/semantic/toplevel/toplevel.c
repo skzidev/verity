@@ -22,7 +22,7 @@ PrimaryExpression semantics_PrimaryExpression(PrimaryExpression expr){
                 // TODO this 0,0 thing will be confusing. fix.
                 // we have to embed document positional data inside the AST structures
                 // right now it isn't accessible to us here
-                THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0001", "use of undefined variable '%s'");
+                THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0001", "use of undefined variable '%s'", expr.VariableName);
                 exit(1);
             }
             // TODO context lookup to find required type
@@ -35,7 +35,8 @@ PrimaryExpression semantics_PrimaryExpression(PrimaryExpression expr){
             printf("\t\t\t\tNULL\n");
             break;
         case PROCEDURE_CALL_RETURN:
-            printf("\t\t\t\tPROC CALL: to \"%s\" with %d parameter(s) \n", expr.call->ident, expr.call->params.count);
+            printf("%s\n", expr.call->ident);
+            // printf("\t\t\t\tPROC CALL: to \"%s\" with %d parameter(s)\n", expr.call->ident, expr.call->params.count);
             break;
         case SUBEXPRESSION:
             printf("\t\t\t\tSUBEXPR: \n");
@@ -89,7 +90,24 @@ ProcedureCall semantics_ProcCall(ProcedureCall stmt){
 }
 
 ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
+    Symbol ProcSym = {0};
+    ProcSym.ident = tp.ident;
+    ProcSym.isMutable = false;
+    ProcSym.kind = ProcedureSymbol;
+    ProcSym.definedLine = tp.line;
+    ScopeStack_InsertSymbolAtLatestScope(&stack, ProcSym);
     ScopeStack_push(&stack);
+    for(int i = 0; i < tp.params.count; i ++){
+        Parameter param = tp.params.data[i];
+        Symbol sym = {0};
+        sym.definedLine = tp.line;
+        sym.ident = param.ident;
+        sym.isMutable = param.isMutable;
+        sym.kind = VariableSymbol;
+        sym.next = NULL;
+        sym.type = param.type;
+        ScopeStack_InsertSymbolAtLatestScope(&stack, sym);
+    }
     for(int i = 0; i < tp.block->count; i ++){
         Statement stmt = tp.block->data[i];
         switch(tp.block->data[i].kind){
@@ -107,8 +125,14 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
             case VARIABLE_ASGN:
                 printf("\t\tVARIABLE ASSIGN: %s\n", tp.block->data[i].varAssignStatement.ident);
                 Symbol* assignedToSym = lookup_symbol(&stack, stmt.varAssignStatement.ident);
-                if(assignedToSym == NULL)
+                if(assignedToSym == NULL){
                     THROW_FROM_USER_CODE(ERROR, filename, stmt.line, 0, "S0002", "cannot assign to undeclared variable '%s'", stmt.varAssignStatement.ident);
+                    exit(1);
+                }
+                else if(assignedToSym->isMutable != true){
+                    THROW_FROM_USER_CODE(ERROR, filename, stmt.line, 0, "S0003", "cannot assign to immutable value '%s'", stmt.varAssignStatement.ident);
+                    exit(1);
+                }
             break;
             case VARIABLE_DEF:
                 printf("\t\tVARIABLE DEF: %s\n", tp.block->data[i].varDefineStatement.ident);
@@ -118,8 +142,10 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
                 newSym.kind = VariableSymbol;
                 newSym.next = NULL;
                 newSym.definedLine = tp.block->data[i].line;
+                newSym.isMutable = stmt.varDefineStatement.isMutable;
                 newSym.type = tp.block->data[i].varDefineStatement.type;
                 ScopeStack_InsertSymbolAtLatestScope(&stack, newSym);
+                // analyze the expression
                 semantics_Expression(tp.block->data[i].varDefineStatement.value);
             break;
             case BREAK:

@@ -8,6 +8,7 @@
 
 ProcedureDefinition parser_ProcedureDefinition(){
     ProcedureDefinition stmt = {0};
+    stmt.line = tok.line;
     if(tok.kind == TOK_PUBLIC){
         stmt.isPublic = true;
         parser_expect(TOK_PUBLIC);

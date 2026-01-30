@@ -11,6 +11,7 @@ Program semantics_enrich(Program ast){
         TopLevelStatement tp = ast.data[i];
         switch(tp.kind){
             case IMPORT:
+                // parse symbols then place in symbol table
                 printf("\tIMPORT STMT: %s, %s\n", tp.impt.package, tp.impt.ident);
             break;
             case PROCEDURE:

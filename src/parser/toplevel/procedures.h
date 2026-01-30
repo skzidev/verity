@@ -12,6 +12,7 @@ typedef struct {
     char* returnType;
     IdentifierList exceptions;
     Block* block;
+    int line;
 } ProcedureDefinition;
 
 ProcedureDefinition parser_ProcedureDefinition();

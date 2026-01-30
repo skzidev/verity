@@ -55,6 +55,7 @@ IfStatement parser_IfStatement(){
 }
 
 Statement parser_statement(){
+    // TODO use a better pattern matching system
     bool requiresSemicolon = true;
     Statement stmt = {0};
     stmt.line = tok.line;
@@ -85,7 +86,7 @@ Statement parser_statement(){
             tok.line,
             tok.column,
             "P0003",
-            "unknown statement kind");
+            "unable to determine stmt kind");
     }
     parser_expect(TOK_SEMI);
     return stmt;
