@@ -1,6 +1,7 @@
 #include "symbols.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void Scope_insertSymbol(Scope* scope, Symbol sym){
     Symbol* newSymbol = (Symbol*) malloc(sizeof(Symbol));
@@ -33,10 +34,15 @@ void ScopeStack_InsertSymbolAtLatestScope(ScopeStack* stack, Symbol sym){
         Scope_insertSymbol(stack->top, sym);
 }
 
-Symbol* lookup_symbol(ScopeStack* stack, const char *name) {
+Symbol* lookup_symbol(ScopeStack* stack, const char *name) {printf("lookup name: '%s' (%p)\n", name, (void*)name);
+
     Scope *current_scope = stack->top;
     while (current_scope != NULL) {
         Symbol *symbol = current_scope->symbolTable;
+        printf("compare '%s' (%p) with '%s' (%p)\n",
+               symbol->ident, (void*)symbol->ident,
+               name, (void*)name);
+
         while (symbol != NULL) {
             if (strcmp(symbol->ident, name) == 0) {
                 return symbol;

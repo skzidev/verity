@@ -1,6 +1,9 @@
 #include "./semantic.h"
+#include "symbols/symbols.h"
 #include "toplevel/toplevel.h"
 #include <stdio.h>
+
+ScopeStack stack = {0};
 
 /**
  * Ensure the AST follows the language rules and add type information
@@ -12,14 +15,22 @@ Program semantics_enrich(Program ast){
         switch(tp.kind){
             case IMPORT:
                 // parse symbols then place in symbol table
-                printf("\tIMPORT STMT: %s, %s\n", tp.impt.package, tp.impt.ident);
             break;
             case PROCEDURE:
-                printf("\tPROC DEF: %s \n", tp.procDef.ident);
+                // TODO put these in a different array to process later and just insert all top level decls into a new array which will be processed with all of the imported symbols intact
+                // Additionally, place all procs into the scope before that
                 semantics_ProcDef(tp.procDef);
             break;
             case EXTERNAL:
-                printf("\tEXTERNAL DECL: %s \n", tp.extDecl.kind == EXTERNAL_PROCDECL ? tp.extDecl.procDecl.ident : tp.extDecl.varDecl.ident);
+                Symbol externalSym = {0};
+                bool isProcedure = tp.extDecl.kind == EXTERNAL_PROCDECL;
+                externalSym.kind = isProcedure ? ProcedureSymbol : VariableSymbol;
+                externalSym.definedLine = tp.extDecl.line;
+                externalSym.ident = isProcedure ? tp.extDecl.procDecl.ident : tp.extDecl.varDecl.ident;
+                externalSym.isMutable = false;
+                if(!isProcedure)
+                    externalSym.type = tp.extDecl.varDecl.type;
+                ScopeStack_InsertSymbolAtLatestScope(&stack, externalSym);
             break;
         }
     }

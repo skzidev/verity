@@ -1,20 +1,17 @@
 #include "toplevel.h"
+#include <string.h>
 #include "../../diags/diagnostics.h"
 #include <stdio.h>
 #include "../symbols/symbols.h"
-
-ScopeStack stack = {0};
+#include "../semantic.h"
 
 PrimaryExpression semantics_PrimaryExpression(PrimaryExpression expr){
     switch(expr.kind){
         case STRING_LITERAL:
-            printf("\t\t\t\tSTRING LITERAL: \"%s\"\n", expr.StringLiteral);
             break;
         case INTEGER_LITERAL:
-            printf("\t\t\t\tINT LITERAL: \"%d\"\n", expr.IntegerLiteral);
             break;
         case FLOAT_LITERAL:
-            printf("\t\t\t\tFLOAT LITERAL: \"%f\"\n", expr.FloatLiteral);
             break;
         case VARIABLE:
             Symbol* sym = lookup_symbol(&stack, expr.VariableName);
@@ -26,20 +23,15 @@ PrimaryExpression semantics_PrimaryExpression(PrimaryExpression expr){
                 exit(1);
             }
             // TODO context lookup to find required type
-            printf("\t\t\t\tVARIABLE: \"%s\"\n", expr.VariableName);
             break;
         case BOOLEAN_LITERAL:
-            printf("\t\t\t\tBOOL LITERAL: \"%b\"\n", expr.BooleanLiteral);
             break;
         case NULL_LITERAL:
-            printf("\t\t\t\tNULL\n");
             break;
         case PROCEDURE_CALL_RETURN:
-            printf("%s\n", expr.call->ident);
             // printf("\t\t\t\tPROC CALL: to \"%s\" with %d parameter(s)\n", expr.call->ident, expr.call->params.count);
             break;
         case SUBEXPRESSION:
-            printf("\t\t\t\tSUBEXPR: \n");
             break;
         default: break;
     }
@@ -62,17 +54,14 @@ MulExpression semantics_MulExpression(MulExpression expr){
 
 AddExpression semantics_AddExpression(AddExpression expr){
     semantics_MulExpression(expr.lhs);
-    if(expr.hasRhs && expr.op == ADD)
-        printf("\t\t\t\tOPERATOR: +\n");
-    else if(expr.op == SUB)
-        printf("\t\t\t\tOPERATOR: -\n");
+    if(expr.hasRhs && expr.op == ADD);
+    else if(expr.op == SUB){}
     if(expr.hasRhs)
         semantics_MulExpression(expr.rhs);
     return expr;
 }
 
 Expression semantics_Expression(Expression expr){
-    printf("\t\t\tEXPRESSION:\n");
     semantics_AddExpression(expr.lhs);
     return expr;
 }
@@ -112,18 +101,14 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
         Statement stmt = tp.block->data[i];
         switch(tp.block->data[i].kind){
             case RETURN:
-                printf("\t\tRETURN\n");
                 semantics_Return(tp.block->data[i].returnStatement);
             break;
             case PROCEDURE_CALL:
-                printf("\t\tPROC CALL: %s\n", tp.block->data[i].procCall.ident);
                 semantics_ProcCall(tp.block->data[i].procCall);
             break;
             case SKIP:
-                printf("\t\tSKIP:\n");
             break;
             case VARIABLE_ASGN:
-                printf("\t\tVARIABLE ASSIGN: %s\n", tp.block->data[i].varAssignStatement.ident);
                 Symbol* assignedToSym = lookup_symbol(&stack, stmt.varAssignStatement.ident);
                 if(assignedToSym == NULL){
                     THROW_FROM_USER_CODE(ERROR, filename, stmt.line, 0, "S0002", "cannot assign to undeclared variable '%s'", stmt.varAssignStatement.ident);
@@ -133,12 +118,17 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
                     THROW_FROM_USER_CODE(ERROR, filename, stmt.line, 0, "S0003", "cannot assign to immutable value '%s'", stmt.varAssignStatement.ident);
                     exit(1);
                 }
+                free(assignedToSym);
             break;
             case VARIABLE_DEF:
-                printf("\t\tVARIABLE DEF: %s\n", tp.block->data[i].varDefineStatement.ident);
                 // Insert this variable into the scope
+                Symbol* assignedTo = lookup_symbol(&stack, tp.block->data[i].varDefineStatement.ident);
                 Symbol newSym = {0};
                 newSym.ident = tp.block->data[i].varDefineStatement.ident;
+                if(assignedTo != NULL && strcmp(assignedTo->ident, newSym.ident) == 0){
+                    THROW_FROM_USER_CODE(ERROR, filename, stmt.line, 0, "S0004", "cannot define variable with variable of same name '%s' (first defined on line %d)", newSym.ident, assignedTo->definedLine);
+                    exit(1);
+                }
                 newSym.kind = VariableSymbol;
                 newSym.next = NULL;
                 newSym.definedLine = tp.block->data[i].line;
@@ -146,15 +136,14 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
                 newSym.type = tp.block->data[i].varDefineStatement.type;
                 ScopeStack_InsertSymbolAtLatestScope(&stack, newSym);
                 // analyze the expression
+                free(assignedTo);
                 semantics_Expression(tp.block->data[i].varDefineStatement.value);
             break;
             case BREAK:
-                printf("\t\tBREAK:\n");
             break;
             case IF:
             case ELSEIF:
             case ELSE:
-                printf("\t\tCONDITIONAL\n");
             break;
         }
     }

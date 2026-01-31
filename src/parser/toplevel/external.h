@@ -18,6 +18,7 @@ typedef enum {
 } ExternalKind;
 typedef struct {
     ExternalKind kind;
+    int line;
     union {
         External_ProcedureDeclaration procDecl;
         External_VariableDeclaration varDecl;

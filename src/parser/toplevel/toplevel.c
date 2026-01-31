@@ -73,6 +73,7 @@ External_VariableDeclaration parser_ExternalVariableDecl(){
 
 ExternalDeclaration parser_ExternalDeclaration(){
     ExternalDeclaration decl = {0};
+    decl.line = tok.line;
     parser_expect(TOK_EXTERNAL);
     if(tok.kind == TOK_PROC){
         decl.kind = EXTERNAL_PROCDECL;
