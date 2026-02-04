@@ -67,6 +67,8 @@ UnaryExpression parser_UnaryExpression(){
 
 PrimaryExpression parser_PrimaryExpression(){
     PrimaryExpression expr = {0};
+    expr.line = tok.line;
+    expr.column = tok.column;
     // TODO add subexpressions to this node parser
     switch(tok.kind){
         case TOK_INT:

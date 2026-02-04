@@ -83,6 +83,7 @@ typedef struct {
 	char *lexeme;
 	int line;
 	int column;
+	int offset;
 } Token;
 
 typedef struct {

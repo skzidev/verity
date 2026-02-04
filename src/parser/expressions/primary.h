@@ -14,6 +14,8 @@ typedef enum {
 } PrimaryKind;
 typedef struct {
     PrimaryKind kind;
+    int line;
+    int column;
     union {
         char* StringLiteral;
         char* VariableName;

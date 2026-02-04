@@ -10,6 +10,7 @@ ScopeStack stack = {0};
  * to each AST node like expressions, and downconvert our size-agnostic types into LLVM's bit-width-dependent typing
  */
 Program semantics_enrich(Program ast){
+    ScopeStack_push(&stack);
     for(int i = 0; i < ast.count; i ++){
         TopLevelStatement tp = ast.data[i];
         switch(tp.kind){
@@ -27,9 +28,9 @@ Program semantics_enrich(Program ast){
                 externalSym.kind = isProcedure ? ProcedureSymbol : VariableSymbol;
                 externalSym.definedLine = tp.extDecl.line;
                 externalSym.ident = isProcedure ? tp.extDecl.procDecl.ident : tp.extDecl.varDecl.ident;
-                externalSym.isMutable = false;
+                externalSym.varSymbol.isMutable = false;
                 if(!isProcedure)
-                    externalSym.type = tp.extDecl.varDecl.type;
+                    externalSym.varSymbol.type = tp.extDecl.varDecl.type;
                 ScopeStack_InsertSymbolAtLatestScope(&stack, externalSym);
             break;
         }

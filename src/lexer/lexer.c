@@ -48,6 +48,7 @@ TokenArray lexer_tokenize(char* input, char* fname){
 		token.lexeme = &currentChar;
 		token.column = column;
 		token.line = line;
+		token.offset = i;
 
 		switch(currentChar){
 			case '\n':
@@ -125,6 +126,7 @@ TokenArray lexer_tokenize(char* input, char* fname){
 				memcpy(buffer, &input[strStart], strLen);
 				buffer[strLen] = '\0';
 				token.lexeme = buffer;
+				token.offset = i;
 				TokenArray_push(&tarr, token);
 				// free(buffer);
 				// buffer = NULL;
@@ -153,6 +155,7 @@ TokenArray lexer_tokenize(char* input, char* fname){
 				memcpy(buf, &input[start], len);
 				buf[len] = '\0';
 				token.lexeme = buf;
+				token.offset = i;
 
 				token.kind = lookup(buf);
 				TokenArray_push(&tarr, token);
@@ -169,6 +172,7 @@ TokenArray lexer_tokenize(char* input, char* fname){
 	eof.lexeme = '\0';
 	eof.line = line;
 	eof.column = column;
+	eof.offset = i;
 	TokenArray_push(&tarr, eof);
 
 	return tarr;

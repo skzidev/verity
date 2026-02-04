@@ -21,29 +21,24 @@ $(BIN): $(SRC)
 bin/%: tests/unit/%.c src/lexer/lexer.c src/diags/diagnostics.c src/config/config.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-run: $(BIN)
+run: $(BIN) ## Build and run the compiler
 	@echo " ============= program output ============="
 	./$(BIN) $(RUNFLAGS)
 
-clean:
+clean: ## Remove build artifacts
 	@rm -f $(BIN)
 
-test: $(TEST_BIN)
+test: $(TEST_BIN) ## Run the testing suite
 	@python tests/tools/run.py
 
-lint:
+lint: ## Run static code analysis
 	@echo "======= This command requires cppcheck and clang-tidy to be installed. ======="
 	cppcheck $(SRC) $(TEST_SRCS)
 	clang-tidy $(SRC) $(TEST_SRCS) --fix-notes
 
-todo:
+todo: ## List todos across the project
 	@python tests/tools/todos.py
 
-help:
-	@echo "Available Build Targets:"
-	@echo "\t- make / make all   Build the compiler"
-	@echo "\t- make run          Build and run"
-	@echo "\t- make test         Run the testing suite"
-	@echo "\t- make clean        Remove build artifacts"
-	@echo "\t- make lint         Check the code for warnings/errors"
-	@echo "\t- make todo         Check the code for todo comments"
+.PHONY: help
+help: ## Show this help
+	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\t\033[36m%-20s\033[0m %s\n", $$1, $$2}'

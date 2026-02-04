@@ -58,6 +58,7 @@ Statement parser_statement(){
     // TODO use a better pattern matching system
     bool requiresSemicolon = true;
     Statement stmt = {0};
+    stmt.start = tok.column;
     stmt.line = tok.line;
     if(tok.kind == TOK_RETURN){
         stmt.kind = RETURN;
@@ -88,6 +89,7 @@ Statement parser_statement(){
             "P0003",
             "unable to determine stmt kind");
     }
+    stmt.end = tok.column;
     parser_expect(TOK_SEMI);
     return stmt;
 }

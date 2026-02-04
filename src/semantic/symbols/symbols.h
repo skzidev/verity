@@ -1,4 +1,5 @@
 #pragma once
+#include "../../parser/structures/identifierlist.h"
 #include <stdbool.h>
 
 typedef enum {
@@ -7,16 +8,35 @@ typedef enum {
     ExternalSymbol
 } SymbolKind;
 
+typedef struct {
+    IdentifierList paramTypes;
+    char* returnType;
+} ProcSymbol;
+
+typedef struct {
+    bool isMutable;
+    char* type;
+} VarSymbol;
+
 typedef struct Symbol {
     SymbolKind kind;
     char* ident;
-    char* type;
     struct Symbol* next;
     int definedLine;
-    bool isMutable;
+    union {
+        VarSymbol varSymbol;
+        ProcSymbol procSymbol;
+    };
 } Symbol;
 
+typedef enum {
+    PROCEDURE_DEFINITION,
+    LOOP,
+    CONDITIONAL
+} ScopeType;
+
 typedef struct Scope {
+    ScopeType kind;
     Symbol* symbolTable;
     struct Scope* parent;
 } Scope;
