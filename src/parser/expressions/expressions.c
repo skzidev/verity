@@ -101,7 +101,7 @@ PrimaryExpression parser_PrimaryExpression(){
             break;
         case TOK_BOOL:
             expr.kind = BOOLEAN_LITERAL;
-            expr.BooleanLiteral = strcmp("true", tok.lexeme) ? true : false;
+            expr.BooleanLiteral = strcmp("true", tok.lexeme) == 0? true : false;
             parser_expect(TOK_BOOL);
             break;
         case TOK_NULL:

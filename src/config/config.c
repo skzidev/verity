@@ -35,6 +35,9 @@ CompilerOptions ParseArgs(int argc, char **argv){
             case 1001:
                 opts.dumpAST = true;
                 break;
+            case 1002:
+                opts.isStandalone = true;
+                break;
             case '?':
                 exit(1);
         }

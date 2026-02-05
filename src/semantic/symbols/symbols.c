@@ -35,9 +35,9 @@ void ScopeStack_InsertSymbolAtLatestScope(ScopeStack* stack, Symbol sym){
 }
 
 Symbol* lookup_symbol(ScopeStack* stack, const char *name) {
-    Scope *current_scope = stack->top;
+    Scope* current_scope = stack->top;
     while (current_scope != NULL) {
-        Symbol *symbol = current_scope->symbolTable;
+        Symbol* symbol = current_scope->symbolTable;
         while (symbol != NULL) {
             if(symbol->ident == NULL) continue;
             if (strcmp(symbol->ident, name) == 0) {

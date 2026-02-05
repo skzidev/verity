@@ -23,6 +23,7 @@ static struct option long_opts[] = {
     { "verbose", no_argument, NULL, 'b' },
     { "log-tokens", no_argument, NULL, 1000 },
     { "log-ast", no_argument, NULL, 1001 },
+    { "standalone", no_argument, NULL, 1002},
     { 0,0,0,0 }
 };
 
@@ -33,6 +34,8 @@ typedef struct {
     bool dumpToks;
     bool help;
     bool verbose;
+
+    bool isStandalone;
 
     bool shouldMute;
 

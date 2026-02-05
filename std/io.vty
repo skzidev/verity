@@ -1,0 +1,5 @@
+external proc printf(string) returns void;
+
+public proc print(string value) returns void {
+    printf(value);
+}

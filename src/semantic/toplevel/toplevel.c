@@ -45,9 +45,7 @@ Type semantics_PrimaryExpression(PrimaryExpression expr){
                 THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0001", "use of undefined variable '%s'", expr.VariableName);
                 exit(1);
             }
-            Type varType = getTypeFromString(sym->varSymbol.type);
-            free(sym);
-            return varType;
+            return getTypeFromString(sym->varSymbol.type);
         case BOOLEAN_LITERAL:
             return BoolType;
         case NULL_LITERAL:
@@ -60,7 +58,6 @@ Type semantics_PrimaryExpression(PrimaryExpression expr){
                 exit(1);
             }
             Type retType = getTypeFromString(callTo->procSymbol.returnType);
-            free(callTo);
             return retType;
         case SUBEXPRESSION:
             break;
@@ -116,7 +113,6 @@ ProcedureCall semantics_ProcCall(ProcedureCall stmt){
         Expression expr = stmt.params.data[i];
         semantics_Expression(expr);
     }
-    free(calledTo);
     return stmt;
 }
 
@@ -142,7 +138,6 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
         THROW_FROM_USER_CODE(ERROR, filename, tp.line, 0, "S0005", "cannot redefine procedure '%s' (originally defined %d)", tp.ident, existingProcDef->definedLine);
         exit(1);
     }
-    free(existingProcDef);
     ScopeStack_InsertSymbolAtLatestScope(&stack, ProcSym);
 
     ScopeStack_push(&stack);
@@ -178,7 +173,6 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
                     THROW_FROM_USER_CODE(ERROR, filename, stmt.line, 0, "S0003", "cannot assign to immutable value '%s'", stmt.varAssignStatement.ident);
                     exit(1);
                 }
-                free(assignedToSym);
             break;
             case VARIABLE_DEF:
                 // Insert this variable into the scope
@@ -196,7 +190,6 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
                 newSym.varSymbol.type = tp.block->data[i].varDefineStatement.type;
                 ScopeStack_InsertSymbolAtLatestScope(&stack, newSym);
                 // analyze the expression
-                free(assignedTo);
                 semantics_Expression(tp.block->data[i].varDefineStatement.value);
             break;
             case BREAK:
