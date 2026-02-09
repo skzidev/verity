@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
 	// Read main source file
 	char* fcontent = readFileToString(opts.inputFiles[0]);
 
-	// get tokens
+	// get tokens from file content
 	if(opts.verbose)
 	    THROW(NOTE, no_code, "Starting Lexical Analysis");
     TokenArray tokenStream = lexer_tokenize(fcontent, opts.inputFiles[0]);
@@ -84,6 +84,7 @@ int main(int argc, char *argv[]){
     if(opts.verbose)
         THROW(NOTE, no_code, "Structural Analysis Complete");
 
+    // ensure language rules are followed
     if(opts.verbose)
         THROW(NOTE, no_code, "Starting Semantic Analysis");
     semantics_enrich(ast);

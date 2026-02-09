@@ -91,8 +91,9 @@ PrimaryExpression parser_PrimaryExpression(){
                 expr.kind = PROCEDURE_CALL_RETURN;
                 // TODO this is stack allocated so it may be inaccessible later
                 // may cause a dangling pointer
-                ProcedureCall call = parser_ProcedureCall();
-                expr.call = &call;
+                ProcedureCall* call = (ProcedureCall*) malloc(sizeof(ProcedureCall));
+                *call = parser_ProcedureCall();
+                expr.call = call;
                 break;
             }
             expr.kind = VARIABLE;

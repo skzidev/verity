@@ -6,6 +6,8 @@ First of all, thank you for wanting to contribute to the Verity language and/or 
 
 It is recommended that contributions use tabs, 4 spaces wide with LF newlines for consistency. Your pull request should not be rejected if formatting does not fully follow these guidelines though.
 
+Additionally, it is preferred to use east side pointers, that is `Type* name` instead of `Type *name`, simply because I consider a pointer to be a part of the type, not the variable. Once again, this is simply preference, and not required.
+
 ### Pull Request Reviews
 
 Unfortunately, because this project is run by volunteers, we cannot ensure that your pull request will be reviewed in a timely manner. We will try our best.

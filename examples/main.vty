@@ -8,14 +8,14 @@ proc add(int a, int b) returns int {
 }
 
 proc readFile(string path) returns string throws FileNotFoundError {
-	return propagate fs.readAsText(path);
+	return propagate path;
 }
 
 proc main() returns int {
     int z = 5;
     mut int y = 10;
 
-    print(add(x, y));
-    print(readFile("./config.txt"));
+    add(z, y);
+
     return 0;
 }

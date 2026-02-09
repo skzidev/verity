@@ -1,4 +1,5 @@
 #include "toplevel.h"
+#include <assert.h>
 #include <string.h>
 #include "../../diags/diagnostics.h"
 #include <stdio.h>
@@ -57,6 +58,10 @@ Type semantics_PrimaryExpression(PrimaryExpression expr){
                 THROW_FROM_USER_CODE(ERROR, filename, expr.line, 0, "S0008", "cannot call undefined procedure '%s'", expr.call->ident);
                 exit(1);
             }
+            if(callTo->kind == VariableSymbol){
+                THROW_FROM_USER_CODE(ERROR, filename, expr.line, 0, "S0012", "cannot call non-procedure symbol '%s'", expr.call->ident);
+                exit(1);
+            }
             Type retType = getTypeFromString(callTo->procSymbol.returnType);
             return retType;
         case SUBEXPRESSION:
@@ -67,52 +72,36 @@ Type semantics_PrimaryExpression(PrimaryExpression expr){
 
 ProcedureCall semantics_ProcCall(ProcedureCall stmt);
 
-UnaryExpression semantics_UnaryExpression(UnaryExpression expr){
-    semantics_PrimaryExpression(expr.lhs);
-    return expr;
+Type semantics_UnaryExpression(UnaryExpression expr){
+    return semantics_PrimaryExpression(expr.lhs);
 }
 
-MulExpression semantics_MulExpression(MulExpression expr){
-    semantics_UnaryExpression(expr.lhs);
-    if(expr.hasRhs && expr.op == MUL){}
-    else if(expr.op == DIV)
+Type semantics_MulExpression(MulExpression expr){
+    Type leftType = semantics_UnaryExpression(expr.lhs);
+    Type rightType = {0};
     if(expr.hasRhs)
-        semantics_UnaryExpression(expr.rhs);
-    return expr;
+        rightType = semantics_UnaryExpression(expr.rhs);
+    if(expr.hasRhs && leftType != rightType)
+        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0009", "operator type mismatch: %d is not compatible for operations with %d", leftType, rightType);
+    return leftType;
 }
 
-AddExpression semantics_AddExpression(AddExpression expr){
-    semantics_MulExpression(expr.lhs);
-    if(expr.hasRhs && expr.op == ADD){
-
-    }
-    else if(expr.op == SUB){}
+Type semantics_AddExpression(AddExpression expr){
+    Type leftType = semantics_MulExpression(expr.lhs);
+    Type rightType = {0};
     if(expr.hasRhs)
-        semantics_MulExpression(expr.rhs);
-    return expr;
+        rightType = semantics_MulExpression(expr.rhs);
+    if(expr.hasRhs && leftType != rightType)
+        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0009", "operator type mismatch: %d is not compatible for operations with %d", leftType, rightType);
+    return leftType;
 }
 
-Expression semantics_Expression(Expression expr){
-    semantics_AddExpression(expr.lhs);
-    return expr;
+Type semantics_Expression(Expression expr){
+    return semantics_AddExpression(expr.lhs);
 }
 
 ReturnStatement semantics_Return(ReturnStatement stmt){
     semantics_Expression(stmt.value);
-    return stmt;
-}
-
-ProcedureCall semantics_ProcCall(ProcedureCall stmt){
-    Symbol* calledTo = lookup_symbol(&stack, stmt.ident);
-    if(calledTo == NULL){
-        // TODO append more location information to the AST so this error has a actual location
-        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0006", "call to undefined procedure '%s'", stmt.ident);
-        exit(1);
-    }
-    for(int i = 0; i < stmt.params.count; i ++){
-        Expression expr = stmt.params.data[i];
-        semantics_Expression(expr);
-    }
     return stmt;
 }
 
@@ -124,7 +113,29 @@ IdentifierList semantics_StripTypesFromParameterList(ParameterList* list){
     return result;
 }
 
-ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
+ProcedureCall semantics_ProcCall(ProcedureCall stmt){
+    Symbol* calledTo = lookup_symbol(&stack, stmt.ident);
+    if(calledTo == NULL){
+        // TODO append more location information to the AST so this error has a actual location
+        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0006", "call to undefined procedure '%s'", stmt.ident);
+    }
+    if(calledTo->kind == VariableSymbol){
+        THROW_FROM_USER_CODE(ERROR, filename, 0,0, "S0010", "cannot call non-procedure symbol '%s'", stmt.ident);
+        return stmt;
+    }
+    char** expected = calledTo->procSymbol.paramTypes.data;
+    printf("proc has arity of %d\n", calledTo->procSymbol.paramTypes.count);
+    DiagnosticAssertion(expected != NULL);
+    for(int i = 0; i < stmt.params.count; i ++){
+        Expression expr = stmt.params.data[i];
+        Type exprType = semantics_Expression(expr);
+        if(getTypeFromString(expected[i]) != exprType)
+            THROW_FROM_USER_CODE(ERROR, filename, 0,0, "S0011", "type mismatch: %d is passed as parameter, but the procedure requires a parameter of type '%s'", exprType, expected[i]);
+    }
+    return stmt;
+}
+
+ProcedureDefinition semantics_ProcDecl(ProcedureDefinition tp){
     Symbol ProcSym = {0};
     ProcSym.ident = tp.ident;
     ProcSym.varSymbol.isMutable = false;
@@ -139,7 +150,10 @@ ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
         exit(1);
     }
     ScopeStack_InsertSymbolAtLatestScope(&stack, ProcSym);
+    return tp;
+}
 
+ProcedureDefinition semantics_ProcDef(ProcedureDefinition tp){
     ScopeStack_push(&stack);
     for(int i = 0; i < tp.params.count; i ++){
         Parameter param = tp.params.data[i];

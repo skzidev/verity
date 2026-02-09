@@ -11,6 +11,7 @@ ScopeStack stack = {0};
  */
 Program semantics_enrich(Program ast){
     ScopeStack_push(&stack);
+    // add all symbols to scope
     for(int i = 0; i < ast.count; i ++){
         TopLevelStatement tp = ast.data[i];
         switch(tp.kind){
@@ -20,7 +21,7 @@ Program semantics_enrich(Program ast){
             case PROCEDURE:
                 // TODO put these in a different array to process later and just insert all top level decls into a new array which will be processed with all of the imported symbols intact
                 // Additionally, place all procs into the scope before that
-                semantics_ProcDef(tp.procDef);
+                semantics_ProcDecl(tp.procDef);
             break;
             case EXTERNAL:
                 Symbol externalSym = {0};
@@ -33,6 +34,14 @@ Program semantics_enrich(Program ast){
                     externalSym.varSymbol.type = tp.extDecl.varDecl.type;
                 ScopeStack_InsertSymbolAtLatestScope(&stack, externalSym);
             break;
+        }
+    }
+    // we use two loops so we can have all file symbols available before the actual code
+    // handle actual code in the procdef
+    for(int i = 0; i < ast.count; i ++){
+        TopLevelStatement tp = ast.data[i];
+        if(tp.kind == PROCEDURE){
+            semantics_ProcDef(tp.procDef);
         }
     }
     return ast;

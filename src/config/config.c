@@ -3,16 +3,7 @@
 #include "config.h"
 
 CompilerOptions ParseArgs(int argc, char **argv){
-    CompilerOptions opts;
-
-    opts.version = false;
-    opts.dumpAST = false;
-    opts.silent = false;
-    opts.help = false;
-    opts.verbose = false;
-    opts.dumpAST = false;
-    opts.dumpToks = false;
-    opts.inputFiles = NULL;
+    CompilerOptions opts = {0};
 
     int opt;
     while((opt = getopt_long(argc, argv, "vshb", long_opts, NULL)) != -1){

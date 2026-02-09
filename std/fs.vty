@@ -1,0 +1,1 @@
+public proc readAsText(string path) returns void;
