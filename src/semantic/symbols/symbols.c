@@ -7,9 +7,16 @@ void Scope_insertSymbol(Scope* scope, Symbol sym){
     Symbol* newSymbol = (Symbol*) malloc(sizeof(Symbol));
     newSymbol->ident = sym.ident;
     newSymbol->kind = sym.kind;
-    newSymbol->varSymbol.type = sym.varSymbol.type;
-    newSymbol->next = sym.next;
     newSymbol->definedLine = sym.definedLine;
+
+    if(sym.kind == VariableSymbol) {
+        newSymbol->varSymbol.type = sym.varSymbol.type;
+        newSymbol->varSymbol.isMutable = sym.varSymbol.isMutable;
+    } else if(sym.kind == ProcedureSymbol) {
+        newSymbol->procSymbol.paramTypes = sym.procSymbol.paramTypes;
+        newSymbol->procSymbol.returnType = sym.procSymbol.returnType;
+    }
+
     newSymbol->next = scope->symbolTable;
     scope->symbolTable = newSymbol;
 }

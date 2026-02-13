@@ -15,6 +15,19 @@ typedef enum {
     CompositeType
 } Type;
 
+char* getStringFromType(Type type){
+    if(type == NullType) return NULL;
+    if(type == IntType)
+        return "int";
+    else if(type == StringType)
+        return "string";
+    else if(type == FloatType)
+        return "float";
+    else if(type == BoolType)
+        return "bool";
+    else return "(composite type)";
+}
+
 Type getTypeFromString(char* str){
     if(str == NULL) return NullType;
     if(strcmp(str, "int") == 0)
@@ -82,7 +95,7 @@ Type semantics_MulExpression(MulExpression expr){
     if(expr.hasRhs)
         rightType = semantics_UnaryExpression(expr.rhs);
     if(expr.hasRhs && leftType != rightType)
-        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0009", "operator type mismatch: %d is not compatible for operations with %d", leftType, rightType);
+        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0009", "operator type mismatch: %s is not compatible for operations with %s", getStringFromType(leftType), getStringFromType(rightType));
     return leftType;
 }
 
@@ -92,7 +105,7 @@ Type semantics_AddExpression(AddExpression expr){
     if(expr.hasRhs)
         rightType = semantics_MulExpression(expr.rhs);
     if(expr.hasRhs && leftType != rightType)
-        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0009", "operator type mismatch: %d is not compatible for operations with %d", leftType, rightType);
+        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0009", "operator type mismatch: %s is not compatible for operations with %s", getStringFromType(leftType), getStringFromType(rightType));
     return leftType;
 }
 
@@ -107,7 +120,7 @@ ReturnStatement semantics_Return(ReturnStatement stmt){
 
 IdentifierList semantics_StripTypesFromParameterList(ParameterList* list){
     IdentifierList result = {0};
-    for(int i = 0; i < list->count; i ++){
+    for(int i = 0; i < list->count; i++){
         IdentifierList_push(&result, list->data[i].type);
     }
     return result;
@@ -124,13 +137,19 @@ ProcedureCall semantics_ProcCall(ProcedureCall stmt){
         return stmt;
     }
     char** expected = calledTo->procSymbol.paramTypes.data;
-    printf("proc has arity of %d\n", calledTo->procSymbol.paramTypes.count);
-    DiagnosticAssertion(expected != NULL);
-    for(int i = 0; i < stmt.params.count; i ++){
-        Expression expr = stmt.params.data[i];
-        Type exprType = semantics_Expression(expr);
-        if(getTypeFromString(expected[i]) != exprType)
-            THROW_FROM_USER_CODE(ERROR, filename, 0,0, "S0011", "type mismatch: %d is passed as parameter, but the procedure requires a parameter of type '%s'", exprType, expected[i]);
+    int expectedCount = calledTo->procSymbol.paramTypes.count;
+    if(stmt.params.count != expectedCount) {
+        THROW_FROM_USER_CODE(ERROR, filename, 0, 0, "S0013", "parameter count mismatch: procedure '%s' expects %d parameters but got %d", stmt.ident, calledTo->procSymbol.paramTypes.count, stmt.params.count);
+        return stmt;
+    }
+    if(expectedCount > 0){
+        DiagnosticAssertion(expected != NULL);
+        for(int i = 0; i < stmt.params.count; i ++){
+            Expression expr = stmt.params.data[i];
+            Type exprType = semantics_Expression(expr);
+            if(getTypeFromString(expected[i]) != exprType)
+                THROW_FROM_USER_CODE(ERROR, filename, 0,0, "S0011", "type mismatch: '%s' is passed as parameter, but the procedure requires a parameter of type '%s'", getStringFromType(exprType), expected[i]);
+        }
     }
     return stmt;
 }

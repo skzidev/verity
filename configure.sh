@@ -10,6 +10,8 @@ for tool in "${required_tools[@]}"; do
 	fi
 done
 
+sudo apt-get install llvm-18-dev  # Debian/Ubuntu
+
 echo "checking for makefile..."
 if ! [[ -f "./makefile" ]]; then
 	echo "makefile does not exist. ensure you cloned the repo correctly".
