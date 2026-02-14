@@ -6,15 +6,6 @@
 #include "../symbols/symbols.h"
 #include "../semantic.h"
 
-typedef enum {
-    StringType,
-    IntType,
-    FloatType,
-    BoolType,
-    NullType,
-    CompositeType
-} Type;
-
 char* getStringFromType(Type type){
     if(type == NullType) return NULL;
     if(type == IntType)

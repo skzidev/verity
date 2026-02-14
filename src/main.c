@@ -19,6 +19,7 @@ __     __        _ _
 #include "./globals.h"
 #include "./parser/parser.h"
 #include "semantic/semantic.h"
+#include "irgen/irgen.h"
 
 #define BUILD_DATE __DATE__
 #define BUILD_TIME __TIME__
@@ -90,6 +91,12 @@ int main(int argc, char *argv[]){
     semantics_enrich(ast);
     if(opts.verbose)
         THROW(NOTE, no_code, "Semantic analysis complete");
+
+    if(opts.verbose)
+        THROW(NOTE, no_code, "Starting IR Generation");
+    irgen_GenerateLLVMIR(&ast);
+    if(opts.verbose)
+        THROW(NOTE, no_code, "IR Generation Complete");
 
     return 0;
 }
