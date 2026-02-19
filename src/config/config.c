@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include "getopt.h"
 #include "config.h"
 
@@ -6,7 +7,7 @@ CompilerOptions ParseArgs(int argc, char **argv){
     CompilerOptions opts = {0};
 
     int opt;
-    while((opt = getopt_long(argc, argv, "vshb", long_opts, NULL)) != -1){
+    while((opt = getopt_long(argc, argv, "vshbt", long_opts, NULL)) != -1){
         switch(opt){
             case 'v':
                 opts.version = true;
@@ -28,6 +29,12 @@ CompilerOptions ParseArgs(int argc, char **argv){
                 break;
             case 1002:
                 opts.isStandalone = true;
+                break;
+            case 1003:
+                opts.dumpIR = true;
+                break;
+            case 't':
+                opts.target = optarg;
                 break;
             case '?':
                 exit(1);
