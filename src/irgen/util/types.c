@@ -4,6 +4,7 @@
 #include "../../diags/diagnostics.h"
 
 int GetTargetBitWidth(){
+    DiagnosticAssertion(opts.target != NULL);
     if(strcmp(opts.target, "aarch64") == 0 || strcmp(opts.target, "x86_64") == 0){
         return 64;
     } else if(strcmp(opts.target, "i386") == 0 || strcmp(opts.target, "arm32")){
@@ -15,6 +16,7 @@ int GetTargetBitWidth(){
 }
 
 Type StringTypeToVerityType(char * type){
+    DiagnosticAssertion(type != NULL);
     if(strcmp(type, "string") == 0){
         return VStringType;
     } else if(strcmp(type, "int") == 0){
@@ -31,10 +33,13 @@ Type StringTypeToVerityType(char * type){
     }
 }
 
-LLVMTypeRef VerityTypeToLLVMType(Type type){
+LLVMTypeRef VerityTypeToLLVMType(Type type, bool* isMut){
+    if(isMut == NULL) isMut = false;
     switch(type){
         case VStringType:
-            return LLVMArrayType(LLVMInt8Type(), 0);
+            if(isMut == false)
+                return LLVMArrayType(LLVMInt8Type(), 0);
+            else return LLVMPointerType(LLVMInt8Type(), 0);
         case VIntegerType:
             switch(GetTargetBitWidth()){
                 case 64:
@@ -53,5 +58,6 @@ LLVMTypeRef VerityTypeToLLVMType(Type type){
             return LLVMInt8Type();
         case VFloatType:
             return LLVMFloatType();
+        default: return LLVMInt64Type();
     }
 }

@@ -41,6 +41,9 @@ CompilerOptions ParseArgs(int argc, char **argv){
         }
     }
 
+    // TODO get current architecture
+    if(opts.target == NULL) opts.target = "x86_64";
+
     for(int i = optind; i < argc; i ++){
         // TODO make opts.inputFiles a valid array-like structure
         opts.inputFiles = &argv[i];

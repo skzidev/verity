@@ -6,7 +6,7 @@
 #include "../symbols/symbols.h"
 #include "../semantic.h"
 
-char* getStringFromType(Type type){
+char* getStringFromType(SemanticType type){
     if(type == NullType) return NULL;
     if(type == IntType)
         return "int";
@@ -19,7 +19,7 @@ char* getStringFromType(Type type){
     else return "(composite type)";
 }
 
-Type getTypeFromString(char* str){
+SemanticType getTypeFromString(char* str){
     if(str == NULL) return NullType;
     if(strcmp(str, "int") == 0)
         return IntType;
@@ -32,7 +32,7 @@ Type getTypeFromString(char* str){
     else return CompositeType;
 }
 
-Type semantics_PrimaryExpression(PrimaryExpression expr){
+SemanticType semantics_PrimaryExpression(PrimaryExpression expr){
     switch(expr.kind){
         case STRING_LITERAL:
             return StringType;
@@ -66,7 +66,7 @@ Type semantics_PrimaryExpression(PrimaryExpression expr){
                 THROW_FROM_USER_CODE(ERROR, filename, expr.line, 0, "S0012", "cannot call non-procedure symbol '%s'", expr.call->ident);
                 exit(1);
             }
-            Type retType = getTypeFromString(callTo->procSymbol.returnType);
+            SemanticType retType = getTypeFromString(callTo->procSymbol.returnType);
             return retType;
         case SUBEXPRESSION:
             break;
@@ -76,13 +76,13 @@ Type semantics_PrimaryExpression(PrimaryExpression expr){
 
 ProcedureCall semantics_ProcCall(ProcedureCall stmt);
 
-Type semantics_UnaryExpression(UnaryExpression expr){
+SemanticType semantics_UnaryExpression(UnaryExpression expr){
     return semantics_PrimaryExpression(expr.lhs);
 }
 
-Type semantics_MulExpression(MulExpression expr){
-    Type leftType = semantics_UnaryExpression(expr.lhs);
-    Type rightType = {0};
+SemanticType semantics_MulExpression(MulExpression expr){
+    SemanticType leftType = semantics_UnaryExpression(expr.lhs);
+    SemanticType rightType = {0};
     if(expr.hasRhs)
         rightType = semantics_UnaryExpression(expr.rhs);
     if(expr.hasRhs && leftType != rightType)
@@ -90,9 +90,9 @@ Type semantics_MulExpression(MulExpression expr){
     return leftType;
 }
 
-Type semantics_AddExpression(AddExpression expr){
-    Type leftType = semantics_MulExpression(expr.lhs);
-    Type rightType = {0};
+SemanticType semantics_AddExpression(AddExpression expr){
+    SemanticType leftType = semantics_MulExpression(expr.lhs);
+    SemanticType rightType = {0};
     if(expr.hasRhs)
         rightType = semantics_MulExpression(expr.rhs);
     if(expr.hasRhs && leftType != rightType)
@@ -100,7 +100,7 @@ Type semantics_AddExpression(AddExpression expr){
     return leftType;
 }
 
-Type semantics_Expression(Expression expr){
+SemanticType semantics_Expression(Expression expr){
     return semantics_AddExpression(expr.lhs);
 }
 
@@ -137,7 +137,7 @@ ProcedureCall semantics_ProcCall(ProcedureCall stmt){
         DiagnosticAssertion(expected != NULL);
         for(int i = 0; i < stmt.params.count; i ++){
             Expression expr = stmt.params.data[i];
-            Type exprType = semantics_Expression(expr);
+            SemanticType exprType = semantics_Expression(expr);
             if(getTypeFromString(expected[i]) != exprType)
                 THROW_FROM_USER_CODE(ERROR, filename, 0,0, "S0011", "type mismatch: '%s' is passed as parameter, but the procedure requires a parameter of type '%s'", getStringFromType(exprType), expected[i]);
         }

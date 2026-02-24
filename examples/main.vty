@@ -8,7 +8,7 @@ proc add(int a, int b) returns int {
 }
 
 proc readFile(string path) returns string throws FileNotFoundError {
-	return propagate path;
+	return path;
 }
 
 proc main() returns int {

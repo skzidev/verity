@@ -11,6 +11,7 @@ typedef enum {
     BoolType,
     NullType,
     CompositeType
-} Type;
+} SemanticType;
 
-Type getTypeFromString(char* str);
+SemanticType getTypeFromString(char* str);
+IdentifierList semantics_StripTypesFromParameterList(ParameterList* list);
